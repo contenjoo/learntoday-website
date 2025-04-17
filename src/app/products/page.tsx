@@ -221,7 +221,7 @@ const handleAddToCart = (product: ProductType) => {
                 <div className="mb-4">
                   <h3 className="font-semibold text-gray-700 mb-2">플랜 선택</h3>
                   <div className="flex flex-wrap gap-2">
-                    {product.plans.map((plan: any) => (
+                    {product.plans.map((plan: ProductPlan) => (
                       <button
                         key={plan.id}
                         onClick={() => handlePlanSelect(product.id, plan.id)}
