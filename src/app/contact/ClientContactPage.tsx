@@ -1,20 +1,13 @@
-'use client';
+"use client";
 
-export const dynamic = 'force-dynamic';
+import { useState, FormEvent } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { Quote, submitQuote } from '@/utils/airtable';
 
-import { Suspense } from 'react';
-import ClientContactPage from './ClientContactPage';
-
-export default function Page() {
-  return (
-    <Suspense fallback={null}>
-      <ClientContactPage />
-    </Suspense>
-  );
-}
+export default function ClientContactPage() {
   const searchParams = useSearchParams();
   const productId = searchParams.get('product');
-  
+
   const [formData, setFormData] = useState({
     schoolName: '',
     contactName: '',
@@ -23,7 +16,7 @@ export default function Page() {
     orderItems: productId ? `제품 ID: ${productId}` : '',
     additionalInfo: '',
   });
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitResult, setSubmitResult] = useState<{
     success: boolean;
@@ -38,9 +31,7 @@ export default function Page() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
     try {
-      // Prepare the quote data
       const quoteData: Quote = {
         SchoolName: formData.schoolName,
         ContactName: formData.contactName,
@@ -50,14 +41,9 @@ export default function Page() {
         AdditionalInfo: formData.additionalInfo,
         OrderDate: new Date().toISOString().split('T')[0],
       };
-      
-      // Submit to Airtable
       const result = await submitQuote(quoteData);
-      
       setSubmitResult(result);
-      
       if (result.success) {
-        // Reset form on success
         setFormData({
           schoolName: '',
           contactName: '',
@@ -128,85 +114,24 @@ export default function Page() {
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth="2"
-                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                      d="M16 12a4 4 0 01-8 0m8 0a4 4 0 00-8 0m8 0V8m0 4v4m0 0a4 4 0 01-8 0"
                     />
                   </svg>
                 </div>
                 <div className="ml-3 text-base text-gray-500">
-                  <p>contact@learntoday.co.kr</p>
+                  <p>contact@oneullearn.com</p>
+                  <p className="mt-1">이메일 문의</p>
                 </div>
               </div>
             </div>
           </div>
-          
-          <div className="mt-12 sm:mt-16 md:mt-0">
+          <div className="mt-12 md:mt-0">
             {submitResult ? (
-              <div
-                className={`rounded-md ${
-                  submitResult.success ? 'bg-green-50' : 'bg-red-50'
-                } p-4 mb-6`}
-              >
-                <div className="flex">
-                  <div className="flex-shrink-0">
-                    {submitResult.success ? (
-                      <svg
-                        className="h-5 w-5 text-green-400"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    ) : (
-                      <svg
-                        className="h-5 w-5 text-red-400"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    )}
-                  </div>
-                  <div className="ml-3">
-                    <h3
-                      className={`text-sm font-medium ${
-                        submitResult.success ? 'text-green-800' : 'text-red-800'
-                      }`}
-                    >
-                      {submitResult.success ? '제출 완료' : '오류 발생'}
-                    </h3>
-                    <div
-                      className={`mt-2 text-sm ${
-                        submitResult.success ? 'text-green-700' : 'text-red-700'
-                      }`}
-                    >
-                      <p>{submitResult.message}</p>
-                    </div>
-                    {submitResult.success && (
-                      <div className="mt-4">
-                        <button
-                          type="button"
-                          className="rounded-md bg-green-50 px-2 py-1.5 text-sm font-medium text-green-800 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2"
-                          onClick={() => setSubmitResult(null)}
-                        >
-                          새 문의하기
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
+              <div className={submitResult.success ? "text-green-600" : "text-red-600"}>
+                {submitResult.message}
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-y-6">
+              <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label htmlFor="schoolName" className="block text-sm font-medium text-gray-700">
                     학교명
