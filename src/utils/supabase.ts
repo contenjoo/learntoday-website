@@ -21,13 +21,20 @@ export type User = {
   updated_at: string;
 };
 
+export type ProductPlan = {
+  id: string;
+  name: string;
+  price: number;
+  priceDisplay: string;
+};
+
 export type Product = {
   id: string;
   name: string;
   category: string;
   description: string;
-  features: any;
-  price_info: any;
+  features: string[];
+  price_info: ProductPlan[];
   image_url: string;
   created_at: string;
   updated_at: string;

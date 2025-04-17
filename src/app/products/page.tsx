@@ -147,9 +147,25 @@ export default function ProductsPage() {
   };
 
   // 장바구니 추가 핸들러
-  const handleAddToCart = (product: any) => {
+  type ProductPlan = {
+  id: string;
+  name: string;
+  price: number;
+  priceDisplay: string;
+};
+
+type ProductType = {
+  id: string;
+  name: string;
+  description: string;
+  image: string;
+  plans: ProductPlan[];
+  features: string[];
+};
+
+const handleAddToCart = (product: ProductType) => {
     const selectedPlanId = selectedPlans[product.id] || product.plans[0].id;
-    const selectedPlan = product.plans.find((plan: any) => plan.id === selectedPlanId);
+    const selectedPlan = product.plans.find((plan: ProductPlan) => plan.id === selectedPlanId);
     const quantity = quantities[product.id] || 1;
     
     if (!selectedPlan) return;
