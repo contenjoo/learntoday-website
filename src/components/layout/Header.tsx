@@ -7,24 +7,33 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <header className="bg-white shadow-lg rounded-b-2xl border-b border-gray-100">
-      <div className="absolute left-0 top-0 w-full h-2 bg-gradient-to-r from-blue-500 to-green-400 rounded-t-2xl" />
+    <header className="bg-white sticky top-0 z-50 shadow-md border-b border-gray-100">
+      {/* Google-style colored top bar */}
+      <div className="absolute left-0 top-0 w-full h-1.5 bg-gradient-to-r from-blue-500 via-red-500 to-yellow-500" />
+      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
+        <div className="flex justify-between h-32"> {/* Increased height */}
           <div className="flex items-center">
             <Link href="/" className="flex-shrink-0 flex items-center">
-              <span className="h-9 w-auto font-extrabold text-2xl tracking-tight text-blue-700 select-none rounded px-2 py-1 bg-blue-50 shadow-sm">오늘배움</span>
+              <Image
+                src="/images/learntoday.png"
+                alt="오늘배움 로고"
+                width={96}
+                height={96}
+                priority
+                className="mr-4"
+              />
             </Link>
             <nav className="hidden md:ml-10 md:flex md:space-x-8">
               <Link 
                 href="/products" 
-                className="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                className="inline-flex items-center px-3 py-2 text-base font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-full transition-colors duration-200"
               >
                 제품 소개
               </Link>
               <Link 
                 href="/contact" 
-                className="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                className="inline-flex items-center px-3 py-2 text-base font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-full transition-colors duration-200"
               >
                 문의하기
               </Link>
@@ -33,14 +42,14 @@ export default function Header() {
           <div className="hidden md:ml-6 md:flex md:items-center gap-2">
             <Link 
               href="/login" 
-              className="inline-flex items-center px-5 py-2 rounded-lg text-base font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 shadow-md transition"
+              className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors duration-200"
               id="login-button"
             >
               로그인
             </Link>
             <Link 
               href="/signup" 
-              className="inline-flex items-center px-5 py-2 rounded-lg text-base font-semibold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition"
+              className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-200"
               id="signup-button"
             >
               회원가입
@@ -49,7 +58,7 @@ export default function Header() {
           <div className="-mr-2 flex items-center md:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+              className="inline-flex items-center justify-center p-2 rounded-full text-gray-500 hover:text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
             >
               <span className="sr-only">메뉴 열기</span>
               {/* Hamburger icon */}
@@ -89,38 +98,39 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Mobile menu */}
-      <div className={`${isMenuOpen ? 'block' : 'hidden'} md:hidden bg-white shadow-lg rounded-b-2xl`}>
-        <div className="pt-2 pb-3 space-y-1">
+      {/* Mobile menu - Google style dropdown */}
+      <div 
+        className={`${isMenuOpen ? 'block' : 'hidden'} md:hidden bg-white shadow-lg absolute w-full transition-all duration-200 ease-in-out`}
+        style={{ maxHeight: isMenuOpen ? '300px' : '0' }}
+      >
+        <div className="pt-2 pb-3 space-y-1 px-4">
           <Link
             href="/products"
-            className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300"
+            className="block px-3 py-2 rounded-full text-base font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition-colors duration-200"
           >
             제품 소개
           </Link>
           <Link
             href="/contact"
-            className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300"
+            className="block px-3 py-2 rounded-full text-base font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition-colors duration-200"
           >
             문의하기
           </Link>
         </div>
-        <div className="pt-4 pb-3 border-t border-gray-200">
-          <div className="flex items-center px-4">
-            <div className="flex-shrink-0">
-              <Link
-                href="/login"
-                className="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100"
-              >
-                로그인
-              </Link>
-              <Link
-                href="/signup"
-                className="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100"
-              >
-                회원가입
-              </Link>
-            </div>
+        <div className="pt-4 pb-3 border-t border-gray-200 px-4">
+          <div className="flex flex-col space-y-2">
+            <Link
+              href="/login"
+              className="block w-full text-center px-4 py-2 rounded-full text-base font-medium text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+            >
+              로그인
+            </Link>
+            <Link
+              href="/signup"
+              className="block w-full text-center px-4 py-2 rounded-full text-base font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-200"
+            >
+              회원가입
+            </Link>
           </div>
         </div>
       </div>

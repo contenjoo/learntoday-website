@@ -4,50 +4,44 @@ import Link from "next/link";
 export default function Home() {
   return (
     <div className="font-[family-name:var(--font-geist-sans)]">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-50 to-indigo-50 py-16 sm:py-24">
+      {/* Hero Section - Google Style */}
+      <section className="py-16 sm:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:grid lg:grid-cols-12 lg:gap-8">
+          <div className="lg:grid lg:grid-cols-12 lg:gap-12 items-center">
             <div className="sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left">
-              <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-                <span className="block">AI 기반</span>
-                <span className="block text-blue-600">교육 솔루션</span>
+              <h1 className="text-4xl tracking-tight font-normal text-gray-900 sm:text-5xl md:text-6xl">
+                <span className="block font-light">가르치는 사람이</span>
+                <span className="block text-blue-600 font-normal">세상을 바꾼다</span>
               </h1>
-              <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-                주식회사 오늘배움은 교육 기관을 위한 다양한 AI 및 디지털 기술 기반 솔루션을 제공합니다. 혁신적인 에듀테크 제품으로 교육의 미래를 함께 만들어갑니다.
+              <p className="mt-4 text-base text-gray-600 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0 leading-relaxed">
+                주식회사 오늘배움은 교사와 교육자가 혁신을 이끌 수 있도록 AI 기반 교육 솔루션을 제공합니다. 교사의 가치를 높이고 교육의 미래를 함께 만들어갑니다.
               </p>
               <div className="mt-8 sm:max-w-lg sm:mx-auto sm:text-center lg:text-left lg:mx-0">
-                <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
-                  <div className="rounded-md shadow">
-                    <Link
-                      href="/products"
-                      className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 md:py-4 md:text-lg md:px-10"
-                    >
-                      제품 살펴보기
-                    </Link>
-                  </div>
-                  <div className="mt-3 sm:mt-0 sm:ml-3">
-                    <Link
-                      href="/contact"
-                      className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 md:py-4 md:text-lg md:px-10"
-                    >
-                      문의하기
-                    </Link>
-                  </div>
+                <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start gap-4">
+                  <Link
+                    href="/products"
+                    className="w-full flex items-center justify-center px-6 py-3 text-base font-medium rounded-full text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-200 shadow-sm"
+                  >
+                    제품 살펴보기
+                  </Link>
+                  <Link
+                    href="/contact"
+                    className="w-full flex items-center justify-center px-6 py-3 text-base font-medium rounded-full text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors duration-200 shadow-sm"
+                  >
+                    문의하기
+                  </Link>
                 </div>
               </div>
             </div>
             <div className="mt-12 relative sm:max-w-lg sm:mx-auto lg:mt-0 lg:max-w-none lg:mx-0 lg:col-span-6 lg:flex lg:items-center">
-              <div className="relative mx-auto w-full rounded-lg shadow-lg lg:max-w-md">
-                <div className="relative block w-full bg-white rounded-lg overflow-hidden">
-                  <div className="w-full h-64 relative">
-                    <Image
-                      src="https://images.unsplash.com/photo-1596495577886-9fd839a2eca4?auto=format&fit=crop&w=1200&q=80"
-                      alt="학생들이 교실에서 공부하는 모습"
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
+              <div className="relative mx-auto w-full rounded-xl overflow-hidden shadow-sm">
+                <div className="w-full h-80 relative">
+                  <Image
+                    src="/images/main.jpeg"
+                    alt="학생들이 교실에서 공부하는 모습"
+                    fill
+                    className="object-cover"
+                  />
                 </div>
               </div>
             </div>
@@ -55,109 +49,97 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-12 bg-white">
+      {/* Features Section - Google Material Style */}
+      <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:text-center">
-            <h2 className="text-base text-blue-600 font-semibold tracking-wide uppercase">특징</h2>
-            <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-              더 나은 교육을 위한 솔루션
+          <div className="text-center mb-16">
+            <h2 className="text-base text-blue-600 font-medium mb-2">우리의 믿음</h2>
+            <p className="text-3xl font-normal text-gray-900">
+              선생님의 역량을 돕는 혁신 솔루션
             </p>
-            <p className="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
-              주식회사 오늘배움의 AI 기반 교육 솔루션은 학습 경험을 혁신적으로 변화시킵니다.
+            <p className="mt-4 max-w-2xl text-lg text-gray-600 mx-auto">
+              오늘배움은 교사의 시간과 역량을 존중하며, 교육자들이 본연의 역할에 집중할 수 있도록 지원합니다.
             </p>
           </div>
 
-          <div className="mt-10">
-            <div className="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
-              {/* Feature 1 */}
-              <div className="relative">
-                <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 text-white">
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-                  </svg>
-                </div>
-                <div className="ml-16">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900">맞춤형 학습</h3>
-                  <p className="mt-2 text-base text-gray-500">
-                    AI 기술을 활용한 개인 맞춤형 학습 경험을 제공하여 학생들의 학습 효율성을 극대화합니다.
-                  </p>
-                </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {/* Feature 1 - Card Style */}
+            <div className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
+              <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-4">
+                <svg className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                </svg>
               </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">맞춤형 학습</h3>
+              <p className="text-gray-600">
+                AI 기술을 활용한 개인 맞춤형 학습 경험을 제공하여 학생들의 학습 효율성을 극대화합니다.
+              </p>
+            </div>
 
-              {/* Feature 2 */}
-              <div className="relative">
-                <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 text-white">
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
-                  </svg>
-                </div>
-                <div className="ml-16">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900">데이터 기반 분석</h3>
-                  <p className="mt-2 text-base text-gray-500">
-                    학습 데이터를 실시간으로 분석하여 교사와 학생에게 유용한 인사이트를 제공합니다.
-                  </p>
-                </div>
+            {/* Feature 2 */}
+            <div className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
+              <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4">
+                <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+                </svg>
               </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">교사 중심 설계</h3>
+              <p className="text-gray-600">
+                교사의 필요와 교육 현장의 요구에 맞춰 개발된 직관적인 AI 도구를 제공합니다.
+              </p>
+            </div>
 
-              {/* Feature 3 */}
-              <div className="relative">
-                <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 text-white">
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                </div>
-                <div className="ml-16">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900">효율적인 관리</h3>
-                  <p className="mt-2 text-base text-gray-500">
-                    학교 행정 및 교육 과정 관리를 자동화하여 교사와 행정 직원의 업무 효율성을 높입니다.
-                  </p>
-                </div>
+            {/* Feature 3 */}
+            <div className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
+              <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mb-4">
+                <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
               </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">효율적인 관리</h3>
+              <p className="text-gray-600">
+                학교 행정 및 교육 과정 관리를 자동화하여 교사와 행정 직원의 업무 효율성을 높입니다.
+              </p>
+            </div>
 
-              {/* Feature 4 */}
-              <div className="relative">
-                <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 text-white">
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                  </svg>
-                </div>
-                <div className="ml-16">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900">소통 강화</h3>
-                  <p className="mt-2 text-base text-gray-500">
-                    교사, 학생, 학부모 간의 소통을 원활하게 하는 다양한 도구를 제공합니다.
-                  </p>
-                </div>
+            {/* Feature 4 */}
+            <div className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
+              <div className="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center mb-4">
+                <svg className="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                </svg>
               </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">소통 강화</h3>
+              <p className="text-gray-600">
+                교사, 학생, 학부모 간의 소통을 원활하게 하는 다양한 도구를 제공합니다.
+              </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="bg-blue-700">
-        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8 lg:flex lg:items-center lg:justify-between">
-          <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-            <span className="block">교육의 미래를 함께 만들어갑니다</span>
-            <span className="block text-blue-200">지금 바로 시작하세요.</span>
+      {/* CTA Section - Google Style */}
+      <section className="py-16 bg-white border-t border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-normal text-gray-900 mb-4">
+            <span className="block">교육의 힘을 함께 키워갑니다</span>
           </h2>
-          <div className="mt-8 flex lg:mt-0 lg:flex-shrink-0">
-            <div className="inline-flex rounded-md shadow">
-              <Link
-                href="/contact"
-                className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-blue-600 bg-white hover:bg-blue-50"
-              >
-                견적 문의하기
-              </Link>
-            </div>
-            <div className="ml-3 inline-flex rounded-md shadow">
-              <Link
-                href="/products"
-                className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-500"
-              >
-                제품 더 알아보기
-              </Link>
-            </div>
+          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+            오늘배움과 함께 학생들의 미래를 위한 혁신적인 교육 환경을 조성해보세요.
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4 max-w-md mx-auto">
+            <Link
+              href="/contact"
+              className="px-6 py-3 rounded-full text-base font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-200 shadow-sm"
+            >
+              견적 문의하기
+            </Link>
+            <Link
+              href="/products"
+              className="px-6 py-3 rounded-full text-base font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors duration-200 shadow-sm"
+            >
+              제품 더 알아보기
+            </Link>
           </div>
         </div>
       </section>

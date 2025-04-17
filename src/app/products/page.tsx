@@ -1,603 +1,382 @@
 'use client';
-import Link from 'next/link';
-import Image from 'next/image';
-import { useState, useReducer } from 'react';
 
-// Mock product data - in a real application, this would come from Supabase
+import React, { useState } from 'react';
+import Image from 'next/image';
+import { useCart } from '@/context/CartContext';
+import CartButton from '@/components/cart/CartButton';
+import CartDrawer from '@/components/cart/CartDrawer';
+
+// 제품 데이터
 const products = [
-  {
-    id: 'chatgpt',
-    name: 'ChatGPT',
-    category: '대화형 AI 도구',
-    description: 'AI 기반 대화형 학습 도구로 자연스러운 대화를 통해 다양한 학습 콘텐츠를 제공합니다.',
-    features: [
-      'GPT-4o mini 모델 사용 가능',
-      '자연스러운 음성 대화 지원',
-      '실시간 웹 검색 기능',
-      '다양한 파일 형식 업로드 및 분석',
-      '고품질 이미지 생성 제공',
-    ],
-    price_info: [
-      'Plus: 50,000원/월',
-      'Plus (연간): 600,000원/년',
-      'Team: 65,000원/월',
-      'Team (연간): 720,000원/년',
-    ],
-    educational_use: [
-      '학생 질문에 대한 즉각적인 응답',
-      '맞춤형 학습 자료 생성',
-      '다양한 주제에 대한 설명 및 예시 제공',
-      '언어 학습 및 작문 지원',
-    ],
-    image_url: '/images/product-placeholder.jpg',
-  },
-  {
-    id: 'claude',
-    name: 'Claude',
-    category: '대화형 AI 도구',
-    description: '자연스러운 대화와 깊이 있는 답변을 제공하는 AI 비서로 복잡한 학습 주제를 쉽게 이해할 수 있도록 돕습니다.',
-    features: [
-      '직관적인 대화형 인터페이스',
-      '복잡한 개념에 대한 상세 설명',
-      '프로젝트 기반 문서 관리',
-      '다양한 Claude 모델 선택 가능',
-      'Claude 3.7 Sonnet 확장 사고모드 지원',
-      '신기능 우선 접근 혜택',
-    ],
-    price_info: [
-      'Claude Pro: 50,000원/월',
-      'Claude Pro (연간): 540,000원/년',
-      'Claude Team: 65,000원/월',
-      'Claude Team (연간): 720,000원/년',
-    ],
-    educational_use: [
-      '논문 및 교육 콘텐츠 분석',
-      '연구 주제 탐색 및 아이디어 도출',
-      '복잡한 개념의 단계별 설명',
-      '교육 자료 요약 및 리뷰',
-    ],
-    image_url: '/images/product-placeholder.jpg',
-  },
-  {
-    id: 'perplexity',
-    name: 'Perplexity',
-    category: '대화형 AI 도구',
-    description: '실시간 웹 검색을 활용한 AI 답변 서비스로 항상 최신 정보에 기반한 정확한 학습 자료를 제공합니다.',
-    features: [
-      '무제한 기본 검색 기능',
-      '프로 계정 고급 검색 300회 이상',
-      '다양한 AI 모델 선택 옵션',
-      '무제한 파일 업로드 지원',
-      '통합 파일 검색 기능',
-      '맞춤형 지식 허브 구축',
-    ],
-    price_info: [
-      'Pro: 50,000원/월',
-      'Pro (연간): 500,000원/년',
-      'Enterprise for Education: 별도 문의',
-    ],
-    educational_use: [
-      '최신 연구 동향 파악',
-      '학생 연구 프로젝트 지원',
-      '교사의 시사 교육 자료 수집',
-      '학습 주제별 최신 정보 제공',
-    ],
-    image_url: '/images/product-placeholder.jpg',
-  },
-  {
-    id: 'kami',
-    name: 'Kami',
-    category: '교육 특화 도구',
-    description: '디지털 문서 협업 도구로 PDF와 다양한 문서에 주석을 추가하고 편집하여 학생들의 참여도를 높입니다.',
-    features: [
-      'PDF 및 디지털 문서 주석 추가',
-      '실시간 협업 기능',
-      '오디오 녹음 및 비디오 피드백',
-      '다양한 그리기 및 마크업 도구',
-      '다양한 교육 플랫폼과의 통합',
-    ],
-    price_info: [
-      '교사 1인: 180,000원/년 (150명 학생)',
-      '학교: 6,000원/학생당 (400명 이상)',
-    ],
-    educational_use: [
-      '학생 과제 피드백 및 평가',
-      '디지털 워크시트 작성 및 배포',
-      '교과서 및 학습 자료 디지털화',
-      '협업 학습 활동 촉진',
-    ],
-    image_url: '/images/product-placeholder.jpg',
-  },
-  {
-    id: 'mizou',
-    name: 'Mizou',
-    category: '교육 특화 도구',
-    description: '50개 이상의 언어를 지원하는 교육 플랫폼으로 국제적인 학습 환경에 최적화된 솔루션을 제공합니다.',
-    features: [
-      '하루 250회 학생 접속 허용',
-      '고성능 AI 모델 활용',
-      '철저한 개인정보 보호',
-      '50개 이상 언어 지원',
-      '음성-텍스트 변환 기능',
-      '텍스트-음성 변환 기능',
-      '맞춤형 지식 파일 제작',
-      '다양한 평가 도구 제공',
-      '학습 인증서 발급',
-    ],
-    price_info: [
-      '개인: 270,000원/년',
-      '팀: 340,000원/년',
-      '학교: 최소 1,500,000원/년 (학생 수에 따라 차등)',
-      '1-299명: 1,500,000원',
-      '300-2,999명: 3,000,000원',
-      '3,000-5,599명: 5,000,000원',
-      '5,600-10,000명: 9,000,000원',
-    ],
-    educational_use: [
-      '다문화 및 국제 교육 지원',
-      '언어 학습 및 번역 지원',
-      '개인화된 학습 경로 제공',
-      '다국어 교육 자료 제작',
-    ],
-    image_url: '/images/product-placeholder.jpg',
-  },
-  {
-    id: 'padlet',
-    name: 'Padlet',
-    category: '교육 특화 도구',
-    description: '직관적인 디지털 게시판 도구로 교사와 학생 간의 효과적인 협업과 아이디어 공유를 지원합니다.',
-    features: [
-      '다양한 형식의 디지털 게시판 생성',
-      '멀티미디어 콘텐츠 통합',
-      '실시간 협업 및 피드백',
-      '접근 권한 및 모더레이션 설정',
-      '다양한 플랫폼 호환성',
-    ],
-    price_info: [
-      '플래티넘: 19,000원/월',
-      '플래티넘 (연간): 180,000원/년',
-      '강의실: 300,000원/년 (교사 2명+학생 200명)',
-      '학교: 130,000원/인당 (최소 10명)',
-    ],
-    educational_use: [
-      '브레인스토밍 및 아이디어 수집',
-      '프로젝트 기반 학습 관리',
-      '학생 포트폴리오 구성',
-      '다양한 학습 자료 중앙화',
-    ],
-    image_url: '/images/product-placeholder.jpg',
-  },
-  {
-    id: 'quizizz',
-    name: 'Quizizz',
-    category: '교육 특화 도구',
-    description: '게임화된 학습 평가 도구로 대화형 퀴즈와 다양한 교실 활동을 통해 학생들의 참여를 유도합니다.',
-    features: [
-      '무제한 평가 자료 저장',
-      '월별 무제한 AI 자료 생성',
-      '18개 이상 문제 유형 제공',
-      '만료된 과제 재사용 가능',
-      '활동 일시정지 및 재개 기능',
-      '맞춤형 유연한 채점 시스템',
-      '학생 맞춤 읽기 지원',
-      '수준별 문제은행 활용',
-    ],
-    price_info: [
-      'Super: 240,000원/년',
-      'School: 11,000원/학생당 (최소 170명)',
-    ],
-    educational_use: [
-      '실시간 형성평가 구현',
-      '학생 자기 주도 학습 지원',
-      '데이터 기반 학습 진단',
-      '맞춤형 학습 도전 과제 제공',
-    ],
-    image_url: '/images/product-placeholder.jpg',
-  },
   {
     id: 'redmenta',
     name: 'Redmenta AI',
-    category: '교육 특화 도구',
-    description: 'AI 기술을 활용한 교육 자료 생성 도구로 교사의 업무 효율성을 높이고 맞춤형 학습 경험을 제공합니다.',
+    description: 'AI 기술을 활용한 교육 자료 생성 도구',
+    image: '/images/redmenta.png',
+    plans: [
+      { id: 'standard', name: 'Standard', price: 150000, priceDisplay: '150,000원/년' },
+      { id: 'pro', name: 'Pro', price: 230000, priceDisplay: '230,000원/년' },
+    ],
     features: [
       'AI 기반 자동 학습자료 생성',
-      '체계적인 워크시트 관리',
-      '학생별 학습 진도 추적',
-      '개인화된 학습자료 제작',
-      '다양한 교과 주제 지원',
+      '워크시트 관리',
+      '학생별 진도 추적',
+      '개인화 학습자료 제작',
     ],
-    price_info: [
-      'Standard: 150,000원/년 (10GB, 1,500개 워크시트)',
-      'Pro: 230,000원/년 (50GB, 7,500개, 우선 지원)',
-    ],
-    educational_use: [
-      '맞춤형 학습 워크시트 생성',
-      '학생 수준별 학습 자료 제작',
-      '교과 학습 보조 자료 개발',
-      '학습 데이터 수집 및 분석',
-    ],
-    image_url: '/images/product-placeholder.jpg',
   },
   {
     id: 'snorkl',
     name: 'Snorkl',
-    category: '교육 특화 도구',
-    description: '디지털 화이트보드와 AI 피드백을 결합한 교육 플랫폼으로 학생들의 사고 과정을 효과적으로 시각화합니다.',
+    description: 'AI 피드백을 결합한 디지털 화이트보드 플랫폼',
+    image: '/images/snorkl.png',
+    plans: [
+      { id: 'teacher', name: 'Teacher', price: 250000, priceDisplay: '250,000원/년' },
+      { id: 'teacher-team', name: 'Teacher Team', price: 220000, priceDisplay: '220,000원/인당' },
+      { id: 'school', name: 'School', price: 1870000, priceDisplay: '1,870,000원/년' },
+      { id: 'district', name: 'District', price: 3630000, priceDisplay: '3,630,000원/별도문의' },
+    ],
     features: [
-      '다양한 사고 표현 디지털 도구',
-      '즉각적인 AI 학습 피드백',
-      '음성 기록 및 분석 기능',
-      '50개 이상 언어 환경 지원',
-      '실시간 학습 데이터 분석',
-      '협업 화이트보드 기능',
+      '디지털 화이트보드',
+      'AI 학습 피드백',
+      '음성 기록 및 분석',
+      '실시간 데이터 분석',
     ],
-    price_info: [
-      'Teacher: 250,000원/년',
-      'Teacher Team: 220,000원/인당 (5인 이상)',
-      'School: 1,870,000원/년',
-      'District: 3,630,000원 (최대 5개 학교)',
-    ],
-    educational_use: [
-      '수학 문제 해결 과정 시각화',
-      '과학 개념 모델링 및 시뮬레이션',
-      '협업적 브레인스토밍 활동',
-      '학생 사고 과정 분석 및 평가',
-    ],
-    image_url: '/images/product-placeholder.jpg',
   },
   {
     id: 'thinglink',
     name: 'ThingLink',
-    category: '교육 특화 도구',
-    description: '몰입형 학습 경험을 제공하는 도구로 이미지와 비디오에 상호작용 요소를 추가하여 학습 효과를 높입니다.',
+    description: '몰입형 학습 경험 제공 도구',
+    image: '/images/thinglink.png',
+    plans: [
+      { id: 'teacher-pro', name: 'Teacher Pro', price: 330000, priceDisplay: '330,000원/년' },
+      { id: 'school', name: '학교', price: 0, priceDisplay: '별도문의' },
+    ],
     features: [
-      '이미지 상호작용 포인트 추가',
-      '360도 가상 투어 제작 기능',
-      '가상 현장 학습 환경 구축',
-      '디지털 포트폴리오 개발',
-      '다양한 교육환경 연동 지원',
-      '멀티미디어 학습 자료 통합',
+      '이미지 상호작용 포인트',
+      '360도 가상 투어',
+      '포트폴리오 개발',
+      '멀티미디어 통합',
     ],
-    price_info: [
-      'Teacher Pro: 330,000원/년 (교사 1인+학생 60명)',
-      '학교: 별도문의',
-    ],
-    educational_use: [
-      '대화형 학습 포스터 제작',
-      '과목별 가상 학습 환경 구축',
-      '가상 현장 학습 경험 제공',
-      '디지털 스토리텔링 구현',
-    ],
-    image_url: '/images/product-placeholder.jpg',
   },
   {
     id: 'briskteaching',
     name: 'BriskTeaching',
-    category: '교육 특화 도구',
-    description: '종합 학습관리시스템으로 교육 자료 제작부터 학생 관리까지 교육 과정 전반을 효율적으로 운영할 수 있습니다.',
+    description: '종합 학습관리시스템(LMS)',
+    image: '/images/brisk.png',
+    plans: [
+      { id: 'educator-pro', name: 'Educator Pro', price: 220000, priceDisplay: '220,000원/년' },
+      { id: 'school-small', name: 'School (1-399명)', price: 8342400, priceDisplay: '8,342,400원/년' },
+      { id: 'school-medium', name: 'School (400-749명)', price: 10238400, priceDisplay: '10,238,400원/년' },
+      { id: 'school-large', name: 'School (750-999명)', price: 16922400, priceDisplay: '16,922,400원/년' },
+    ],
     features: [
-      '직관적인 교육자료 제작 도구',
-      '상세한 학생 진도 관리 기능',
-      '자동화된 피드백 시스템',
-      '맞춤형 학습 경로 설계',
-      '종합적인 학습 데이터 분석',
-      '온라인 평가 도구 통합',
+      '교육자료 제작 도구',
+      '학생 진도 관리',
+      '자동화 피드백',
+      '학습 데이터 분석',
     ],
-    price_info: [
-      'Educator Pro: 220,000원/년 (교사 1인)',
-      'School: 8,342,400원/년 (1-399명)',
-      'School: 10,238,400원/년 (400-749명)',
-      'School: 16,922,400원/년 (750-999명)',
+  },
+  {
+    id: 'padlet',
+    name: 'Padlet',
+    description: '디지털 협업 및 포트폴리오 도구',
+    image: '/images/padlet.png',
+    plans: [
+      { id: 'basic', name: 'Basic', price: 0, priceDisplay: '무료' },
+      { id: 'pro', name: 'Pro', price: 120000, priceDisplay: '120,000원/년' },
+      { id: 'school', name: 'School', price: 2500000, priceDisplay: '2,500,000원/년' },
     ],
-    educational_use: [
-      '전체 교육과정 관리 및 운영',
-      '데이터 기반 맞춤형 교육 설계',
-      '학생 학습 여정 추적 및 분석',
-      '학부모-교사-학생 소통 강화',
+    features: [
+      '직관적인 디지털 게시판',
+      '다양한 미디어 지원',
+      '실시간 협업',
+      '다양한 공유 옵션',
     ],
-    image_url: '/images/product-placeholder.jpg',
+  },
+  {
+    id: 'quizizz',
+    name: 'Quizizz',
+    description: '게임화된 학습 평가 도구',
+    image: '/images/quizizz.png',
+    plans: [
+      { id: 'basic', name: 'Basic', price: 0, priceDisplay: '무료' },
+      { id: 'super', name: 'Super', price: 150000, priceDisplay: '150,000원/년' },
+      { id: 'school', name: 'School', price: 0, priceDisplay: '별도문의' },
+    ],
+    features: [
+      '게임화된 퀴즈',
+      '실시간 결과 분석',
+      '맞춤형 학습 경로',
+      '다양한 문제 유형',
+    ],
   },
 ];
 
-// 장바구니 아이템 타입 정의
-interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  image_url: string;
-  plan: string;
-  quantity: number;
-}
-
-// 장바구니 상태 관리를 위한 리듀서
-function cartReducer(state: CartItem[], action: any) {
-  switch (action.type) {
-    case 'ADD_ITEM': {
-      const existingItemIndex = state.findIndex(
-        item => item.id === action.item.id && item.plan === action.item.plan
-      );
-      
-      if (existingItemIndex >= 0) {
-        // 이미 존재하는 아이템이면 수량만 증가
-        const newState = [...state];
-        newState[existingItemIndex].quantity += action.item.quantity;
-        return newState;
-      } else {
-        // 새 아이템 추가
-        return [...state, action.item];
-      }
-    }
-    case 'REMOVE_ITEM':
-      return state.filter(item => 
-        !(item.id === action.id && item.plan === action.plan)
-      );
-    case 'UPDATE_QUANTITY':
-      return state.map(item => 
-        (item.id === action.id && item.plan === action.plan)
-          ? { ...item, quantity: action.quantity }
-          : item
-      );
-    case 'CLEAR_CART':
-      return [];
-    default:
-      return state;
-  }
-}
-
 export default function ProductsPage() {
-  // 선택된 제품 옵션 상태
-  const [selected, setSelected] = useState<{ [id: string]: { plan: string; price: number; quantity: number } }>({});
-  
-  // 장바구니 상태
-  const [cart, dispatch] = useReducer(cartReducer, []);
-  
-  // 장바구니 드로어 상태
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  
-  // 총 금액 계산
-  const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  
+  const { dispatch } = useCart();
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [selectedPlans, setSelectedPlans] = useState<Record<string, string>>({});
+  const [quantities, setQuantities] = useState<Record<string, number>>({});
+  const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
+  const [quoteInfo, setQuoteInfo] = useState({
+    name: '',
+    email: '',
+    school: '',
+    phone: '',
+    message: '',
+  });
+
   // 플랜 선택 핸들러
-  const handlePlanChange = (id: string, plan: string, price: number) => {
-    setSelected(prev => ({
+  const handlePlanSelect = (productId: string, planId: string) => {
+    setSelectedPlans(prev => ({
       ...prev,
-      [id]: { ...prev[id], plan, price, quantity: prev[id]?.quantity || 1 }
+      [productId]: planId
     }));
   };
-  
+
   // 수량 변경 핸들러
-  const handleQuantityChange = (id: string, delta: number) => {
-    setSelected(prev => ({
-      ...prev,
-      [id]: {
-        ...prev[id],
-        quantity: Math.max(1, (prev[id]?.quantity || 1) + delta),
-      }
-    }));
+  const handleQuantityChange = (productId: string, change: number) => {
+    setQuantities(prev => {
+      const currentQty = prev[productId] || 1;
+      const newQty = Math.max(1, currentQty + change);
+      return {
+        ...prev,
+        [productId]: newQty
+      };
+    });
   };
-  
+
   // 장바구니 추가 핸들러
   const handleAddToCart = (product: any) => {
-    const sel = selected[product.id];
-    if (!sel?.plan || !sel?.price) {
-      alert('플랜을 먼저 선택해 주세요');
-      return;
-    }
+    const selectedPlanId = selectedPlans[product.id] || product.plans[0].id;
+    const selectedPlan = product.plans.find((plan: any) => plan.id === selectedPlanId);
+    const quantity = quantities[product.id] || 1;
+    
+    if (!selectedPlan) return;
     
     dispatch({
       type: 'ADD_ITEM',
-      item: {
+      product: {
         id: product.id,
         name: product.name,
-        price: sel.price,
-        image_url: product.image_url,
-        plan: sel.plan,
-        quantity: sel.quantity || 1
+        price: selectedPlan.price,
+        image_url: product.image,
+        plan: selectedPlan.name,
+        quantity: quantity
       }
     });
     
-    setDrawerOpen(true);
+    setIsCartOpen(true);
   };
 
   return (
-    <div className="bg-white">
-      <div className="max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8">
-        <div className="text-center">
-          <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-            AI 기반 교육 솔루션
+    <>
+      <div className="container mx-auto px-4 py-8 pb-24">
+        <div className="mb-12 text-center">
+          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            오늘배움 에듀테크 제품
           </h1>
-          <p className="mt-4 max-w-2xl mx-auto text-xl text-gray-500">
-            주식회사 오늘배움의 혁신적인 에듀테크 제품을 소개합니다.
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            최신 AI 기술과 혁신적인 교육 방법론을 결합한 오늘배움의 에듀테크 제품으로 교육 현장의 혁신을 경험하세요.
           </p>
         </div>
 
-        <div className="mt-12 space-y-16">
-          {products.map((product, productIdx) => {
-  // 가격 옵션 파싱 (ex: 'Plus: 50,000원/월')
-  const plans = (product.price_info || []).map((str: string) => {
-    const match = str.match(/(.+?):\s*([\d,]+)원/);
-    if (match) {
-      return { plan: match[1], price: parseInt(match[2].replace(/,/g, '')) };
-    }
-    return { plan: str, price: 0 };
-  });
-  const sel = selected[product.id] || { plan: '', price: 0, quantity: 1 };
-  return (
-    <div
-      key={product.id}
-      className={
-        'flex flex-col md:flex-row rounded-2xl shadow bg-white border border-neutral-100 overflow-hidden mb-8 transition hover:shadow-lg' +
-        (productIdx % 2 === 0 ? '' : ' md:flex-row-reverse')
-      }
-      style={{ minHeight: 320 }}
-    >
-      <div className="flex-1 p-8 flex flex-col justify-center">
-        <div className="text-base text-blue-600 font-semibold tracking-wide uppercase mb-1">
-          {product.category}
-        </div>
-        <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight sm:text-3xl mb-2">
-          {product.name}
-        </h2>
-        <p className="mb-4 text-lg text-gray-500">{product.description}</p>
-        <div className="mb-4">
-          <h3 className="text-sm font-medium text-gray-900 mb-1">주요 기능</h3>
-          <ul className="pl-4 list-disc space-y-1">
-            {product.features.map((feature: string) => (
-              <li key={feature} className="text-sm text-gray-500">
-                {feature}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="mb-4">
-          <h3 className="text-sm font-medium text-gray-900 mb-1">가격 옵션</h3>
-          <div className="flex gap-2 flex-wrap">
-            {plans.map((p) => (
-              <button
-                key={p.plan}
-                className={`px-3 py-1 rounded-full border text-xs font-medium transition ${sel.plan === p.plan ? 'bg-blue-600 text-white border-blue-600' : 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100'}`}
-                onClick={() => handlePlanChange(product.id, p.plan, p.price)}
-                type="button"
-              >
-                {p.plan} <span className="ml-1">{p.price.toLocaleString()}원</span>
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="flex items-center gap-3 mb-4">
-          <span className="text-sm text-gray-700">수량</span>
-          <button
-            className="w-7 h-7 rounded-full bg-gray-100 text-lg font-bold flex items-center justify-center hover:bg-blue-100"
-            onClick={() => handleQuantityChange(product.id, -1)}
-            type="button"
-          >-</button>
-          <span className="w-8 text-center">{sel.quantity}</span>
-          <button
-            className="w-7 h-7 rounded-full bg-gray-100 text-lg font-bold flex items-center justify-center hover:bg-blue-100"
-            onClick={() => handleQuantityChange(product.id, 1)}
-            type="button"
-          >+</button>
-        </div>
-        <div className="flex gap-3 mt-2">
-          <button
-            className="inline-flex items-center px-5 py-2 rounded-lg shadow-sm text-base font-medium bg-blue-600 text-white hover:bg-blue-700 transition"
-            onClick={() => handleAddToCart(product)}
-            type="button"
-          >
-            장바구니에 추가
-          </button>
-          <Link
-            href={`/contact?product=${product.id}`}
-            className="inline-flex items-center px-5 py-2 rounded-lg shadow-sm text-base font-medium bg-white text-blue-700 border border-blue-600 hover:bg-blue-50 transition"
-          >
-            견적 문의하기
-          </Link>
-        </div>
-      </div>
-      <div className="flex-1 min-w-[300px] flex items-center justify-center bg-neutral-50">
-        <Image
-          src={product.image_url}
-          alt={product.name}
-          width={220}
-          height={220}
-          className="rounded-xl shadow-sm bg-white object-contain"
-        />
-      </div>
-    </div>
-  );
-})}
-
-        </div>
-
-        <div className="mt-16 bg-blue-50 rounded-lg overflow-hidden shadow-lg">
-          <div className="px-6 py-8 sm:p-10 sm:pb-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="col-span-2">
-                <h3 className="text-2xl font-extrabold text-gray-900 tracking-tight">
-                  맞춤형 솔루션이 필요하신가요?
-                </h3>
-                <p className="mt-4 text-lg text-gray-500">
-                  귀하의 교육 기관에 맞는 맞춤형 AI 솔루션을 개발해 드립니다. 특별한 요구사항이 있으시면 언제든지 문의해 주세요.
-                </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {products.map((product) => (
+            <div
+              key={product.id}
+              className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col"
+              style={{ boxShadow: 'rgba(60,64,67,0.15) 0px 1px 3px 1px' }}
+            >
+              <div className="relative h-48 overflow-hidden">
+                <Image
+                  src={product.image}
+                  alt={product.name}
+                  fill
+                  style={{ objectFit: 'cover' }}
+                  className="transition-transform duration-500 hover:scale-105"
+                />
               </div>
-              <div className="flex items-center justify-center lg:justify-end">
-                <Link
-                  href="/contact"
-                  className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
-                >
-                  상담 문의하기
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      {/* 장바구니 버튼 */}
-      <button
-        className="fixed top-6 right-8 z-50 flex items-center gap-2 bg-white border shadow-md rounded-full px-4 py-2 hover:bg-gray-50 transition"
-        onClick={() => setDrawerOpen(true)}
-        aria-label="장바구니 열기"
-        style={{ boxShadow: 'rgba(60,64,67,0.3) 0px 1.5px 8px 0px' }}
-      >
-        <svg width="28" height="28" fill="none" viewBox="0 0 24 24"><path d="M6 6h15l-1.68 8.39A2 2 0 0 1 17.36 16H8.64a2 2 0 0 1-1.96-1.61L4 4H2" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><circle cx="9" cy="21" r="1" fill="#2563eb"/><circle cx="19" cy="21" r="1" fill="#2563eb"/></svg>
-        <span className="font-bold text-blue-700">{cart.reduce((sum, item) => sum + item.quantity, 0)}</span>
-      </button>
-
-      {/* 장바구니 드로어 */}
-      <div
-        className={`fixed top-0 right-0 h-full w-96 bg-white shadow-2xl z-40 transform transition-transform duration-300 ease-in-out ${drawerOpen ? 'translate-x-0' : 'translate-x-full'}`}
-        style={{ boxShadow: drawerOpen ? 'rgba(60,64,67,0.3) 0px 1.5px 8px 0px' : undefined }}
-      >
-        <div className="flex items-center justify-between p-6 border-b">
-          <h2 className="text-xl font-bold text-gray-900">장바구니</h2>
-          <button onClick={() => setDrawerOpen(false)} className="text-gray-400 hover:text-gray-700 text-2xl">×</button>
-        </div>
-        <div className="p-6 flex flex-col gap-4 h-[calc(100%-160px)] overflow-y-auto">
-          {cart.length === 0 ? (
-            <div className="text-center text-gray-500 mt-16">장바구니가 비어있습니다.</div>
-          ) : (
-            cart.map((item) => (
-              <div key={item.id + (item.plan || '')} className="flex gap-4 items-center border-b pb-4">
-                <Image src={item.image_url} alt={item.name} width={64} height={64} className="rounded bg-gray-100" />
-                <div className="flex-1">
-                  <div className="font-semibold text-gray-800">{item.name}</div>
-                  {item.plan && <div className="text-xs text-gray-500">{item.plan}</div>}
-                  <div className="flex items-center gap-2 mt-2">
-                    <button
-                      className="rounded px-2 py-1 bg-gray-200 hover:bg-gray-300"
-                      onClick={() => dispatch({ type: 'UPDATE_QUANTITY', id: item.id, plan: item.plan, quantity: Math.max(1, item.quantity - 1) })}
-                    >-</button>
-                    <span className="w-8 text-center">{item.quantity}</span>
-                    <button
-                      className="rounded px-2 py-1 bg-gray-200 hover:bg-gray-300"
-                      onClick={() => dispatch({ type: 'UPDATE_QUANTITY', id: item.id, plan: item.plan, quantity: item.quantity + 1 })}
-                    >+</button>
+              
+              <div className="p-6 flex-grow">
+                <h2 className="text-xl font-bold mb-2 text-gray-800">{product.name}</h2>
+                <p className="text-gray-600 mb-4">{product.description}</p>
+                
+                <div className="mb-4">
+                  <h3 className="font-semibold text-gray-700 mb-2">플랜 선택</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {product.plans.map((plan: any) => (
+                      <button
+                        key={plan.id}
+                        onClick={() => handlePlanSelect(product.id, plan.id)}
+                        className={`px-3 py-1.5 text-sm rounded-full transition-colors ${
+                          selectedPlans[product.id] === plan.id
+                            ? 'bg-blue-100 text-blue-700 ring-1 ring-blue-300'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        {plan.name} - {plan.priceDisplay}
+                      </button>
+                    ))}
                   </div>
                 </div>
-                <div className="text-right min-w-[80px]">
-                  <div className="font-bold text-blue-700">{(item.price * item.quantity).toLocaleString()}원</div>
-                  <button
-                    className="mt-2 text-xs text-red-500 hover:underline"
-                    onClick={() => dispatch({ type: 'REMOVE_ITEM', id: item.id, plan: item.plan })}
-                  >삭제</button>
+                
+                <div className="mb-4">
+                  <h3 className="font-semibold text-gray-700 mb-2">주요 기능</h3>
+                  <ul className="grid grid-cols-2 gap-x-2 gap-y-1">
+                    {product.features.map((feature: string, idx: number) => (
+                      <li key={idx} className="text-sm text-gray-600 flex items-start">
+                        <svg className="w-4 h-4 text-green-500 mr-1 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </div>
-            ))
-          )}
+              
+              <div className="px-6 pb-6">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-medium text-gray-700">수량:</span>
+                  <div className="flex items-center border rounded-lg overflow-hidden">
+                    <button 
+                      className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700"
+                      onClick={() => handleQuantityChange(product.id, -1)}
+                    >
+                      -
+                    </button>
+                    <span className="w-10 text-center">{quantities[product.id] || 1}</span>
+                    <button 
+                      className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700"
+                      onClick={() => handleQuantityChange(product.id, 1)}
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+                <button
+                  onClick={() => handleAddToCart(product)}
+                  className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
+                >
+                  <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
+                    <path d="M6 6h15l-1.68 8.39A2 2 0 0 1 17.36 16H8.64a2 2 0 0 1-1.96-1.61L4 4H2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <circle cx="9" cy="21" r="1" fill="currentColor"/>
+                    <circle cx="19" cy="21" r="1" fill="currentColor"/>
+                  </svg>
+                  장바구니에 추가
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
-        <div className="p-6 border-t">
-          <div className="flex justify-between items-center mb-4">
-            <span className="font-semibold text-lg">총 합계</span>
-            <span className="font-bold text-2xl text-blue-700">{totalPrice.toLocaleString()}원</span>
-          </div>
-          <Link
-            href={`/contact?products=${encodeURIComponent(JSON.stringify(cart))}`}
-            className="w-full py-3 rounded bg-blue-600 text-white font-bold text-lg shadow hover:bg-blue-700 transition block text-center"
+        
+        <div className="mt-16 text-center">
+          <h2 className="text-2xl font-bold mb-4">맞춤형 견적이 필요하신가요?</h2>
+          <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
+            다수의 라이센스 구매나 학교/기관 단위 도입을 위한 맞춤형 견적을 받아보세요.
+            오늘배움의 전문 컨설턴트가 최적의 솔루션을 제안해 드립니다.
+          </p>
+          <button
+            onClick={() => setIsQuoteModalOpen(true)}
+            className="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition-shadow"
           >
-            견적 문의하기
-          </Link>
+            맞춤 견적 문의하기
+          </button>
         </div>
       </div>
-    </div>
+      
+      {/* 장바구니 버튼 */}
+      <CartButton onClick={() => setIsCartOpen(true)} />
+      
+      {/* 장바구니 드로어 */}
+      <CartDrawer open={isCartOpen} onClose={() => setIsCartOpen(false)} />
+      
+      {/* 견적 문의 모달 */}
+      {isQuoteModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div
+            className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6"
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">맞춤 견적 문의</h2>
+              <button onClick={() => setIsQuoteModalOpen(false)} className="text-gray-400 hover:text-gray-600">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
+            
+            <form className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">이름</label>
+                <input
+                  type="text"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                  value={quoteInfo.name}
+                  onChange={(e) => setQuoteInfo({...quoteInfo, name: e.target.value})}
+                  placeholder="홍길동"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">이메일</label>
+                <input
+                  type="email"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                  value={quoteInfo.email}
+                  onChange={(e) => setQuoteInfo({...quoteInfo, email: e.target.value})}
+                  placeholder="example@school.edu"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">학교/기관명</label>
+                <input
+                  type="text"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                  value={quoteInfo.school}
+                  onChange={(e) => setQuoteInfo({...quoteInfo, school: e.target.value})}
+                  placeholder="OO고등학교"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">연락처</label>
+                <input
+                  type="tel"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                  value={quoteInfo.phone}
+                  onChange={(e) => setQuoteInfo({...quoteInfo, phone: e.target.value})}
+                  placeholder="010-1234-5678"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">문의 내용</label>
+                <textarea
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                  rows={4}
+                  value={quoteInfo.message}
+                  onChange={(e) => setQuoteInfo({...quoteInfo, message: e.target.value})}
+                  placeholder="필요한 제품과 수량, 특별 요청사항 등을 자유롭게 작성해주세요."
+                />
+              </div>
+              
+              <button
+                type="button"
+                className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-colors"
+                onClick={() => {
+                  alert('견적 문의가 접수되었습니다. 빠른 시일 내에 연락드리겠습니다.');
+                  setIsQuoteModalOpen(false);
+                }}
+              >
+                견적 문의하기
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

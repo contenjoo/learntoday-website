@@ -28,6 +28,7 @@ const CartContext = createContext<{
 function cartReducer(state: CartState, action: CartAction): CartState {
   switch (action.type) {
     case 'ADD_ITEM': {
+      console.log('Adding item to cart:', action.product);
       // 동일 상품+플랜이면 수량 증가
       const idx = state.items.findIndex(
         (item) => item.id === action.product.id && item.plan === action.product.plan
@@ -35,9 +36,12 @@ function cartReducer(state: CartState, action: CartAction): CartState {
       if (idx !== -1) {
         const items = [...state.items];
         items[idx].quantity += action.product.quantity;
+        console.log('Updated cart items:', items);
         return { items };
       }
-      return { items: [...state.items, action.product] };
+      const newItems = [...state.items, action.product];
+      console.log('New cart items:', newItems);
+      return { items: newItems };
     }
     case 'REMOVE_ITEM': {
       return {
@@ -63,7 +67,34 @@ function cartReducer(state: CartState, action: CartAction): CartState {
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [cart, dispatch] = useReducer(cartReducer, { items: [] });
+  // localStorage에서 장바구니 상태 불러오기
+  const initialState = { items: [] };
+  
+  const [cart, dispatch] = useReducer(cartReducer, initialState, () => {
+    if (typeof window !== 'undefined') {
+      try {
+        const savedCart = localStorage.getItem('cart');
+        return savedCart ? JSON.parse(savedCart) : initialState;
+      } catch (error) {
+        console.error('Failed to load cart from localStorage:', error);
+        return initialState;
+      }
+    }
+    return initialState;
+  });
+  
+  // 장바구니 상태가 변경될 때마다 localStorage에 저장
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('cart', JSON.stringify(cart));
+        console.log('Cart saved to localStorage:', cart);
+      } catch (error) {
+        console.error('Failed to save cart to localStorage:', error);
+      }
+    }
+  }, [cart]);
+  
   return (
     <CartContext.Provider value={{ cart, dispatch }}>
       {children}
