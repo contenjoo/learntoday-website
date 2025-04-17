@@ -1,29 +1,21 @@
 'use client';
 
-import { useState, FormEvent, Suspense } from 'react';
+export const dynamic = 'force-dynamic';
+
+import { useState, FormEvent } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Quote, submitQuote } from '@/utils/airtable';
 
-// SearchParams 컴포넌트 분리
-function SearchParamsWrapper() {
-  const searchParams = useSearchParams();
-  return searchParams.get('product');
-}
-
 export default function ContactPage() {
-  // Suspense로 감싸서 사용
-  const productId = (
-    <Suspense fallback={null}>
-      <SearchParamsWrapper />
-    </Suspense>
-  );
+  const searchParams = useSearchParams();
+  const productId = searchParams.get('product');
   
   const [formData, setFormData] = useState({
     schoolName: '',
     contactName: '',
     phoneNumber: '',
     email: '',
-    orderItems: typeof productId === 'string' ? `제품 ID: ${productId}` : '',
+    orderItems: productId ? `제품 ID: ${productId}` : '',
     additionalInfo: '',
   });
   
