@@ -45,10 +45,11 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-medium text-gray-900 mb-4">회사 정보</h3>
             <ul className="space-y-2">
-              <li className="text-sm text-gray-600">사업자등록번호: 000-00-00000</li>
-              <li className="text-sm text-gray-600">대표: 홍길동</li>
-              <li className="text-sm text-gray-600">주소: 서울특별시 강남구 테헤란로 123</li>
-              <li className="text-sm text-gray-600">전화: 02-123-4567</li>
+              <li className="text-sm text-gray-600">사업자등록번호: 313-86-02193</li>
+              <li className="text-sm text-gray-600">대표: 주방현</li>
+              <li className="text-sm text-gray-600">주소(본사): 대전광역시 유성구 지족로351 402호</li>
+              <li className="text-sm text-gray-600">주소(이노베이션센터): 대전광역시 서구 만년로68번길 15-20 6층 613호</li>
+              <li className="text-sm text-gray-600">전화: 0507-1316-1571</li>
             </ul>
           </div>
           

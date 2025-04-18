@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Quote, submitQuote } from '@/utils/airtable';
 
@@ -23,13 +23,37 @@ export default function ClientContactPage() {
     message: string;
   } | null>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  // 입력값 검증 함수
+  const validateForm = () => {
+    if (!formData.schoolName || !formData.contactName || !formData.phoneNumber || !formData.email) {
+      return '모든 필수 항목을 입력해주세요.';
+    }
+    // 이메일 형식 체크
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      return '올바른 이메일 주소를 입력해주세요.';
+    }
+    // 전화번호 형식 체크 (숫자, -, 공백 허용)
+    const phoneRegex = /^[0-9\-\s]+$/;
+    if (!phoneRegex.test(formData.phoneNumber)) {
+      return '전화번호는 숫자, - 만 입력 가능합니다.';
+    }
+    return '';
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  }, []);
+
+  const handleSubmit = useCallback(async (e: FormEvent) => {
     e.preventDefault();
+    setSubmitResult(null);
+    const errorMsg = validateForm();
+    if (errorMsg) {
+      setSubmitResult({ success: false, message: errorMsg });
+      return;
+    }
     setIsSubmitting(true);
     try {
       const quoteData: Quote = {
@@ -62,7 +86,7 @@ export default function ClientContactPage() {
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [formData]);
 
   return (
     <div className="bg-white">
@@ -77,6 +101,17 @@ export default function ClientContactPage() {
               아래 양식을 작성하시면 담당자가 빠르게 연락드리겠습니다.
             </p>
             <div className="mt-9">
+              {/* 회사 정보 섹션 */}
+              <div className="mt-8 p-4 rounded-lg border border-gray-200 bg-gray-50">
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">회사 정보</h3>
+                <ul className="text-gray-600 text-sm space-y-1">
+                  <li><span className="font-medium">사업자등록번호:</span> 313-86-02193</li>
+                  <li><span className="font-medium">대표:</span> 주방현</li>
+                  <li><span className="font-medium">주소(본사):</span> 대전광역시 유성구 지족로351 402호</li>
+                  <li><span className="font-medium">주소(이노베이션센터):</span> 대전광역시 서구 만년로68번길 15-20 6층 613호</li>
+                  <li><span className="font-medium">전화:</span> 0507-1316-1571</li>
+                </ul>
+              </div>
               <div className="flex">
                 <div className="flex-shrink-0">
                   <svg
@@ -126,11 +161,18 @@ export default function ClientContactPage() {
             </div>
           </div>
           <div className="mt-12 md:mt-0">
-            {submitResult ? (
-              <div className={submitResult.success ? "text-green-600" : "text-red-600"}>
+            {submitResult && (
+              <div
+                role="alert"
+                aria-live="assertive"
+                className={`mt-4 p-3 rounded-md text-sm font-medium transition-colors duration-300 ${
+                  submitResult.success ? 'bg-green-100 text-green-800 border border-green-300' : 'bg-red-100 text-red-800 border border-red-300'
+                }`}
+              >
                 {submitResult.message}
               </div>
-            ) : (
+            )}
+            {!submitResult && (
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label htmlFor="schoolName" className="block text-sm font-medium text-gray-700">
