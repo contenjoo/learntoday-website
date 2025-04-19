@@ -23,19 +23,26 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
   if (!open) return null;
 
   return (
-    <div
-      className="fixed inset-0 bg-black bg-opacity-50 z-40 flex justify-end"
-      onClick={handleOutsideClick}
-    >
+    <>
+      {/* 반투명 오버레이 */}
       <div
-        className="h-full w-96 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out"
-        style={{ boxShadow: 'rgba(60,64,67,0.3) 0px 1.5px 8px 0px' }}
+        className="fixed inset-0 bg-black bg-opacity-50 z-40"
+        onClick={handleOutsideClick}
+      />
+      {/* 장바구니 컨텐츠 */}
+      <div
+        className="fixed inset-0 z-40 flex items-center justify-center overflow-auto"
+        style={{ pointerEvents: 'none' }}
       >
-        <div className="flex items-center justify-between p-6 border-b">
+      <div
+        className="max-h-[80vh] w-[90%] max-w-lg bg-white shadow-2xl rounded-xl transform transition-all duration-300 ease-in-out"
+        style={{ boxShadow: 'rgba(60,64,67,0.3) 0px 4px 16px 0px', pointerEvents: 'auto' }}
+      >
+        <div className="flex items-center justify-between p-4 border-b sticky top-0 bg-white z-10">
           <h2 className="text-xl font-bold text-gray-900">장바구니</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-700 text-2xl">×</button>
         </div>
-        <div className="p-6 flex flex-col gap-4 h-[calc(100%-160px)] overflow-y-auto">
+        <div className="p-4 flex flex-col gap-4 max-h-[50vh] overflow-y-auto">
           {cart.items.length === 0 ? (
             <div className="text-center text-gray-500 mt-16">장바구니가 비어있습니다.</div>
           ) : (
@@ -82,13 +89,13 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
             })
           )}
         </div>
-        <div className="p-6 border-t">
-          <div className="flex justify-between items-center mb-4">
+        <div className="p-4 border-t sticky bottom-0 bg-white z-10">
+          <div className="flex justify-between items-center mb-3">
             <span className="font-semibold text-lg">총 합계</span>
             <span className="font-bold text-2xl text-blue-700">{total.toLocaleString()}원</span>
           </div>
           <button
-            className="w-full py-3 rounded bg-blue-600 text-white font-bold text-lg shadow hover:bg-blue-700 transition"
+            className="w-full py-2.5 rounded-lg bg-blue-600 text-white font-bold text-base shadow hover:bg-blue-700 transition"
             disabled={cart.items.length === 0}
           >
             견적 문의하기
@@ -96,5 +103,6 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
         </div>
       </div>
     </div>
+    </>
   );
 }

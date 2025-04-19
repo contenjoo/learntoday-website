@@ -1,7 +1,10 @@
+"use client";
 import Image from "next/image";
 import Link from "next/link";
+import { useDemoContext } from "@/context/DemoContext";
 
 export default function Home() {
+  const { openDemoScheduler } = useDemoContext();
   return (
     <div className="font-[family-name:var(--font-geist-sans)]">
       {/* Hero Section - Google Style */}
@@ -24,12 +27,12 @@ export default function Home() {
                   >
                     제품 살펴보기
                   </Link>
-                  <Link
-                    href="/contact"
+                  <button
+                    onClick={openDemoScheduler}
                     className="w-full flex items-center justify-center px-6 py-3 text-base font-medium rounded-full text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors duration-200 shadow-sm"
                   >
-                    문의하기
-                  </Link>
+                    1:1 데모 신청하기
+                  </button>
                 </div>
               </div>
             </div>
@@ -128,12 +131,12 @@ export default function Home() {
             오늘배움과 함께 학생들의 미래를 위한 혁신적인 교육 환경을 조성해보세요.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4 max-w-md mx-auto">
-            <Link
-              href="/contact"
+            <button
+              onClick={openDemoScheduler}
               className="px-6 py-3 rounded-full text-base font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-200 shadow-sm"
             >
-              견적 문의하기
-            </Link>
+              1:1 데모 신청하기
+            </button>
             <Link
               href="/products"
               className="px-6 py-3 rounded-full text-base font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors duration-200 shadow-sm"

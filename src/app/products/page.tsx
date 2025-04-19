@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
 import CartButton from '@/components/cart/CartButton';
 import CartDrawer from '@/components/cart/CartDrawer';
+import MiniCartToast from '@/components/cart/MiniCartToast';
 
 // 제품 데이터
 const products = [
@@ -14,8 +15,35 @@ const products = [
     description: 'AI 기술을 활용한 교육 자료 생성 도구',
     image: '/images/redmenta.png',
     plans: [
-      { id: 'standard', name: 'Standard', price: 150000, priceDisplay: '150,000원/년' },
-      { id: 'pro', name: 'Pro', price: 230000, priceDisplay: '230,000원/년' },
+      { 
+        id: 'standard', 
+        name: 'AI Plan', 
+        price: 150000, 
+        priceDisplay: '150,000원/년',
+        features: [
+          '10GB 저장 공간',
+          'AI 기반 자동 학습자료 생성',
+          '워크시트 관리',
+          '학생별 진도 추적',
+          '기본 고객 지원',
+        ]
+      },
+      { 
+        id: 'pro', 
+        name: 'AI Pro Plan', 
+        price: 230000, 
+        priceDisplay: '230,000원/년',
+        features: [
+          '50GB 저장 공간',
+          'AI 기반 자동 학습자료 생성',
+          '워크시트 관리',
+          '학생별 진도 추적',
+          '개인화 학습자료 제작',
+          '우선 고객 지원',
+          '고급 분석 도구',
+          '학습 자료 내보내기',
+        ]
+      },
     ],
     features: [
       'AI 기반 자동 학습자료 생성',
@@ -33,7 +61,7 @@ const products = [
       { id: 'teacher', name: 'Teacher', price: 250000, priceDisplay: '250,000원/년' },
       { id: 'teacher-team', name: 'Teacher Team', price: 220000, priceDisplay: '220,000원/인당' },
       { id: 'school', name: 'School', price: 1870000, priceDisplay: '1,870,000원/년' },
-      { id: 'district', name: 'District', price: 3630000, priceDisplay: '3,630,000원/별도문의' },
+      { id: 'district', name: '동일지역 5개학교 공동구매', price: 726000, priceDisplay: '학교당 726,000원' },
     ],
     features: [
       '디지털 화이트보드',
@@ -115,6 +143,8 @@ const products = [
 export default function ProductsPage() {
   const { dispatch } = useCart();
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isMiniCartVisible, setIsMiniCartVisible] = useState(false);
+  const [lastAddedItem, setLastAddedItem] = useState<any>(null);
   const [selectedPlans, setSelectedPlans] = useState<Record<string, string>>({});
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
@@ -147,11 +177,12 @@ export default function ProductsPage() {
   };
 
   // 장바구니 추가 핸들러
-  type ProductPlan = {
+  interface ProductPlan {
   id: string;
   name: string;
   price: number;
   priceDisplay: string;
+  features?: string[];
 };
 
 type ProductType = {
@@ -170,23 +201,33 @@ const handleAddToCart = (product: ProductType) => {
     
     if (!selectedPlan) return;
     
+    const newItem = {
+      id: product.id,
+      name: product.name,
+      price: selectedPlan.price,
+      image_url: product.image,
+      plan: selectedPlan.name,
+      quantity: quantity
+    };
+    
     dispatch({
       type: 'ADD_ITEM',
-      product: {
-        id: product.id,
-        name: product.name,
-        price: selectedPlan.price,
-        image_url: product.image,
-        plan: selectedPlan.name,
-        quantity: quantity
-      }
+      product: newItem
     });
     
-    setIsCartOpen(true);
+    // 미니 장바구니 토스트 표시
+    setLastAddedItem(newItem);
+    setIsMiniCartVisible(true);
   };
 
   return (
     <>
+      <MiniCartToast 
+        isVisible={isMiniCartVisible} 
+        onClose={() => setIsMiniCartVisible(false)} 
+        onViewCart={() => setIsCartOpen(true)}
+        newItemAdded={lastAddedItem}
+      />
       <div className="container mx-auto px-4 py-8 pb-24">
         <div className="mb-12 text-center">
           <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -240,14 +281,29 @@ const handleAddToCart = (product: ProductType) => {
                 <div className="mb-4">
                   <h3 className="font-semibold text-gray-700 mb-2">주요 기능</h3>
                   <ul className="grid grid-cols-2 gap-x-2 gap-y-1">
-                    {product.features.map((feature: string, idx: number) => (
-                      <li key={idx} className="text-sm text-gray-600 flex items-start">
-                        <svg className="w-4 h-4 text-green-500 mr-1 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <span>{feature}</span>
-                      </li>
-                    ))}
+                    {product.id === 'redmenta' && selectedPlans[product.id] ? (
+                      // Redmenta AI 제품의 경우 선택된 플랜의 기능 목록 표시
+                      product.plans
+                        .find((plan: any) => plan.id === selectedPlans[product.id])
+                        ?.features?.map((feature: string, idx: number) => (
+                          <li key={idx} className="text-sm text-gray-600 flex items-start">
+                            <svg className="w-4 h-4 text-green-500 mr-1 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span>{feature}</span>
+                          </li>
+                        ))
+                    ) : (
+                      // 다른 제품의 경우 기존 기능 목록 표시
+                      product.features.map((feature: string, idx: number) => (
+                        <li key={idx} className="text-sm text-gray-600 flex items-start">
+                          <svg className="w-4 h-4 text-green-500 mr-1 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                          </svg>
+                          <span>{feature}</span>
+                        </li>
+                      ))
+                    )}
                   </ul>
                 </div>
               </div>

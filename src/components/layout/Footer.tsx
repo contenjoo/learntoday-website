@@ -1,6 +1,8 @@
 "use client";
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import NewsletterForm from '@/components/NewsletterForm';
+import { useDemoContext } from '@/context/DemoContext';
 
 function YearCopyright() {
   const [year, setYear] = useState<string | null>(null);
@@ -15,11 +17,12 @@ function YearCopyright() {
 }
 
 export default function Footer() {
+  const { openDemoScheduler } = useDemoContext();
   return (
     <footer className="bg-white border-t border-gray-100 mt-auto pt-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Google-style footer with sections */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 sm:gap-8 pb-8">
           <div>
             <h3 className="text-sm font-medium text-gray-900 mb-4">주식회사 오늘배움</h3>
             <p className="text-sm text-gray-600 mb-2">교육 기관을 위한 AI 및 디지털 기술 기반 솔루션</p>
@@ -35,9 +38,12 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-sm text-gray-600 hover:text-blue-600 transition-colors duration-200">
-                  견적 문의
-                </Link>
+                <button 
+                  onClick={openDemoScheduler} 
+                  className="text-sm text-gray-600 hover:text-blue-600 transition-colors duration-200 cursor-pointer bg-transparent border-none p-0 text-left"
+                >
+                  1:1 데모 신청하기
+                </button>
               </li>
             </ul>
           </div>
@@ -67,6 +73,10 @@ export default function Footer() {
                 </Link>
               </li>
             </ul>
+          </div>
+          
+          <div className="sm:col-span-2 lg:col-span-1">
+            <NewsletterForm />
           </div>
         </div>
         
