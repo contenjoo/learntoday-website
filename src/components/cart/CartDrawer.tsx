@@ -24,6 +24,8 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
     additionalInfo: ''
   });
   const [showForm, setShowForm] = useState(false);
+  const [orderSuccess, setOrderSuccess] = useState(false);
+  const [orderNumber, setOrderNumber] = useState('');
 
   // 장바구니 바깥 영역 클릭 시 닫히는 핸들러
   // 배경이 없으므로 필요 없음
@@ -117,7 +119,50 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
       toast.success('주문이 성공적으로 접수되었습니다!');
       dispatch({ type: 'CLEAR_CART' }); // 장바구니 비우기
       setShowForm(false); // 폼 닫기
-      onClose(); // 장바구니 닫기
+      
+      // 주문 번호 생성 (YYYYMMDD-XXXX 형식)
+      const now = new Date();
+      const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+      const randomNum = Math.floor(1000 + Math.random() * 9000); // 1000-9999 사이의 랜덤 숫자
+      const generatedOrderNumber = `${dateStr}-${randomNum}`;
+      
+      // 로컬 스토리지에 주문 데이터 저장 (데이터베이스 연동 문제 대비)
+      try {
+        // 기존 주문 데이터 가져오기
+        const existingOrdersStr = localStorage.getItem('learntoday_orders');
+        const existingOrders = existingOrdersStr ? JSON.parse(existingOrdersStr) : [];
+        
+        // 새 주문 데이터 추가
+        // 장바구니에서 총금액 계산
+        const calculatedTotal = orderItems.reduce((sum, item) => {
+          return sum + (item.price * item.quantity);
+        }, 0);
+        
+        const newOrder = {
+          id: `local-${Date.now()}`,
+          order_number: generatedOrderNumber,
+          created_at: now.toISOString(),
+          customer_name: customerInfo.name,
+          customer_email: customerInfo.email,
+          customer_phone: customerInfo.phone,
+          customer_school: customerInfo.school,
+          additional_info: customerInfo.additionalInfo || '',
+          items: orderItems,
+          total_amount: calculatedTotal,
+          status: 'completed'
+        };
+        
+        // 주문 데이터 추가 및 저장
+        existingOrders.unshift(newOrder); // 가장 최근 주문을 맨 앞에 추가
+        localStorage.setItem('learntoday_orders', JSON.stringify(existingOrders));
+        
+        console.log('테스트 주문: 로컬 스토리지에 주문 데이터 저장 성공', newOrder);
+      } catch (error) {
+        console.error('테스트 주문: 로컬 스토리지 저장 오류', error);
+      }
+      
+      setOrderNumber(generatedOrderNumber);
+      setOrderSuccess(true); // 주문 성공 화면 표시
 
     } catch (error: any) {
       // 상세 에러 로깅
@@ -184,15 +229,22 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
     };
   }, [open]);
 
+  // 주문 완료 후 상태 초기화
+  const resetOrderState = () => {
+    setOrderSuccess(false);
+    setOrderNumber('');
+    onClose();
+  };
+
   if (!open) return null;
 
   return (
     <div
-      className="fixed top-20 right-8 z-50 overflow-auto"
+      className="fixed top-20 right-4 sm:right-8 z-50 overflow-auto"
     >
       <div
         id="cart-drawer"
-        className="max-h-[80vh] w-[90vw] max-w-md bg-white shadow-2xl rounded-xl transform transition-all duration-300 ease-in-out"
+        className="max-h-[80vh] w-[95vw] sm:w-[90vw] max-w-md bg-white shadow-2xl rounded-xl transform transition-all duration-300 ease-in-out"
         style={{ boxShadow: 'rgba(60,64,67,0.3) 0px 4px 16px 0px' }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -257,7 +309,47 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
             })
           )}
         </div>
-        {!showForm ? (
+        {orderSuccess ? (
+          <div className="p-6 bg-green-50 rounded-lg shadow-md border-t mt-4">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-green-800 mb-2">주문이 성공적으로 완료되었습니다!</h3>
+              <p className="text-green-700 mb-6">주문해주셔서 감사합니다. 주문 정보를 확인해 보세요.</p>
+              
+              <div className="bg-white p-4 rounded-lg border border-green-200 mb-6">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-gray-600">주문번호</span>
+                  <span className="font-bold text-gray-800">{orderNumber}</span>
+                </div>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-gray-600">주문자</span>
+                  <span className="font-bold text-gray-800">{customerInfo.name}</span>
+                </div>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-gray-600">연락처</span>
+                  <span className="font-bold text-gray-800">{customerInfo.phone}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">총 결제금액</span>
+                  <span className="font-bold text-blue-700">{total.toLocaleString()}원</span>
+                </div>
+              </div>
+              
+              <p className="text-sm text-gray-600 mb-6">주문 상세 내역은 입력하신 이메일로 발송되었습니다.<br/>주문과 관련하여 문의사항이 있으시면 연락주세요.</p>
+              
+              <button
+                className="w-full py-3 rounded-lg bg-green-600 text-white font-bold text-base shadow hover:bg-green-700 transition"
+                onClick={resetOrderState}
+              >
+                확인
+              </button>
+            </div>
+          </div>
+        ) : !showForm ? (
           <div className="p-4 border-t sticky bottom-0 bg-white z-10">
             <div className="flex justify-between items-center mb-3">
               <span className="font-semibold text-lg">총 합계</span>

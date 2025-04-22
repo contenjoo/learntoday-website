@@ -213,10 +213,10 @@ const products = [
     description: 'AI 기술을 활용한 교육 자료 생성 도구',
     image: '/images/redmenta.png',
     plans: [
-      { 
-        id: 'standard', 
-        name: 'AI Plan', 
-        price: 150000, 
+      {
+        id: 'standard',
+        name: 'AI Plan',
+        price: 150000,
         priceDisplay: '150,000원/년',
         features: [
           '10GB 저장 공간',
@@ -226,10 +226,10 @@ const products = [
           '기본 고객 지원',
         ]
       },
-      { 
-        id: 'pro', 
-        name: 'AI Pro Plan', 
-        price: 230000, 
+      {
+        id: 'pro',
+        name: 'AI Pro Plan',
+        price: 230000,
         priceDisplay: '230,000원/년',
         features: [
           '50GB 저장 공간',
@@ -257,10 +257,10 @@ const products = [
     image: '/images/snorkl.png',
     plans: [
       { id: 'teacher', name: 'Teacher', price: 250000, priceDisplay: '250,000원/년' },
-      { 
-        id: 'teacher-team', 
-        name: 'Teacher Team (최소 5명)', 
-        price: 220000, 
+      {
+        id: 'teacher-team',
+        name: 'Teacher Team (최소 5명)',
+        price: 220000,
         priceDisplay: '220,000원/인당 (최소 5명)',
         minQuantity: 5,
         features: [
@@ -272,10 +272,10 @@ const products = [
         ]
       },
       { id: 'school', name: 'School', price: 1870000, priceDisplay: '1,870,000원/년' },
-      { 
-        id: 'district', 
-        name: 'District', 
-        price: 3630000, 
+      {
+        id: 'district',
+        name: 'District',
+        price: 3630000,
         priceDisplay: '3,630,000원 (동일지역 5개학교 공동구매시 학교당 726,000원)',
         features: [
           '디지털 화이트보드',
@@ -482,17 +482,17 @@ export default function ProductsPage() {
       ...prev,
       [productId]: planId
     }));
-    
+
     // 최소 수량이 필요한 플랜 처리
     const product = products.find(p => p.id === productId);
     if (!product) return;
-    
+
     const selectedPlan = product.plans.find(p => p.id === planId);
     if (!selectedPlan) return;
-    
+
     // 최소 수량 확인
     let minQuantity = 1;
-    
+
     // Padlet 학교 플랜인 경우 최소 10개
     if (productId === 'padlet' && planId === 'school') {
       minQuantity = 10;
@@ -513,7 +513,7 @@ export default function ProductsPage() {
     else if ('minQuantity' in selectedPlan && typeof selectedPlan.minQuantity === 'number') {
       minQuantity = selectedPlan.minQuantity;
     }
-    
+
     // 최소 수량 설정
     setQuantities(prev => {
       const currentQty = prev[productId] || 1;
@@ -528,6 +528,48 @@ export default function ProductsPage() {
   const handleQuantityChange = (productId: string, change: number) => {
     setQuantities(prev => {
       const currentQty = prev[productId] || 1;
+      const selectedPlanId = selectedPlans[productId];
+
+      // 최소 수량 설정
+      let minQty = 1;
+
+      // 특정 플랜에 대한 최소 수량 설정
+      if (productId === 'padlet' && selectedPlanId === 'school') {
+        minQty = 10; // Padlet 학교 플랜인 경우 최소 10개
+      } else if (productId === 'claude' && selectedPlanId === 'team') {
+        minQty = 5; // Claude Team 플랜인 경우 최소 5개
+      } else if (productId === 'chatgpt' && selectedPlanId === 'team') {
+        minQty = 2; // ChatGPT Team 플랜인 경우 최소 2개
+      } else {
+        // 제품과 플랜 찾기
+        const product = products.find(p => p.id === productId);
+        if (product) {
+          const selectedPlan = product.plans.find(plan => plan.id === selectedPlanId);
+          if (selectedPlan && 'minQuantity' in selectedPlan && typeof selectedPlan.minQuantity === 'number') {
+            minQty = selectedPlan.minQuantity;
+          }
+        }
+      }
+
+      // 현재 수량이 최소 수량보다 작으면 최소 수량으로 설정
+      if (currentQty < minQty) {
+        return {
+          ...prev,
+          [productId]: minQty
+        };
+      }
+
+      const newQty = Math.max(minQty, currentQty + change);
+      return {
+        ...prev,
+        [productId]: newQty
+      };
+    });
+  };
+  
+  // 수량 직접 입력 핸들러
+  const handleQuantityInput = (productId: string, value: number) => {
+    setQuantities(prev => {
       const selectedPlanId = selectedPlans[productId];
       
       // 최소 수량 설정
@@ -551,15 +593,8 @@ export default function ProductsPage() {
         }
       }
       
-      // 현재 수량이 최소 수량보다 작으면 최소 수량으로 설정
-      if (currentQty < minQty) {
-        return {
-          ...prev,
-          [productId]: minQty
-        };
-      }
-      
-      const newQty = Math.max(minQty, currentQty + change);
+      // 입력된 값이 최소 수량보다 작으면 최소 수량으로 설정
+      const newQty = Math.max(minQty, value);
       return {
         ...prev,
         [productId]: newQty
@@ -592,25 +627,25 @@ const handleAddToCart = (product: ProductType) => {
     const selectedPlanId = selectedPlans[product.id] || product.plans[0].id;
     const selectedPlan = product.plans.find(plan => plan.id === selectedPlanId);
     const quantity = quantities[product.id] || 1;
-    
+
     if (!selectedPlan) return;
-    
+
     // 선택된 결제 주기에 따라 가격 설정
     let price = selectedPlan.price;
-    
+
     // 월간 결제 옵션이 있는 제품인지 확인 (Perplexity, Claude, ChatGPT만 적용)
     const hasMonthlyOption = ['perplexity', 'claude', 'chatgpt'].includes(product.id);
     const currentBillingCycle = getBillingCycle(product.id);
-    
+
     // 월별 결제인 경우 monthlyPrice 사용 (월간 옵션이 있는 제품만)
     if (hasMonthlyOption && currentBillingCycle === 'monthly' && 'monthlyPrice' in selectedPlan && typeof selectedPlan.monthlyPrice === 'number') {
       price = selectedPlan.monthlyPrice;
-    } 
+    }
     // 연간 결제인 경우 yearlyPrice 사용
     else if (currentBillingCycle === 'yearly' && 'yearlyPrice' in selectedPlan && typeof selectedPlan.yearlyPrice === 'number') {
       price = selectedPlan.yearlyPrice;
     }
-    
+
     // 구독형 상품은 plan을 'month' 또는 'year'로 명확히 지정
     let planValue = selectedPlan.name;
     if (['perplexity', 'claude', 'chatgpt'].includes(product.id)) {
@@ -625,12 +660,12 @@ const handleAddToCart = (product: ProductType) => {
       plan: planValue,
       quantity: quantity
     };
-    
+
     dispatch({
       type: 'ADD_ITEM',
       product: newItem
     });
-    
+
     // 미니 장바구니 토스트 표시
     setLastAddedItem(newItem);
     setIsMiniCartVisible(true);
@@ -638,9 +673,9 @@ const handleAddToCart = (product: ProductType) => {
 
   return (
     <>
-      <MiniCartToast 
-        isVisible={isMiniCartVisible} 
-        onClose={() => setIsMiniCartVisible(false)} 
+      <MiniCartToast
+        isVisible={isMiniCartVisible}
+        onClose={() => setIsMiniCartVisible(false)}
         onViewCart={() => setIsCartOpen(true)}
         newItemAdded={lastAddedItem}
       />,
@@ -683,15 +718,15 @@ const handleAddToCart = (product: ProductType) => {
           <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             오늘배움 에듀테크 제품
           </h1>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto whitespace-nowrap">최신 AI 기술과 혁신적인 교육 방법론을 결합한 오늘배움의 에듀테크 제품으로 교육 현장의 혁신을 경험하세요.</p>
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto">최신 AI 기술과 혁신적인 교육 방법론을 결합한 오늘배움의 에듀테크 제품으로 교육 현장의 혁신을 경험하세요.</p>
         </div>
-        
+
         {/* AI 제품 섹션 (Perplexity, Claude, ChatGPT) */}
         <div className="mb-12">
           <h2 className="text-2xl font-bold mb-4 text-center">교육용 AI 서비스</h2>
-          
+
           {/* AI 제품 그리드 */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-12">
             {products
               .filter(product => ['perplexity', 'claude', 'chatgpt'].includes(product.id))
               .map((product) => (
@@ -709,18 +744,18 @@ const handleAddToCart = (product: ProductType) => {
                       className="transition-transform duration-500 hover:scale-105"
                     />
                   </div>
-                  
+
                   <div className="p-6 flex-grow">
                     <h2 className="text-xl font-bold mb-2 text-gray-800">{product.name}</h2>
                     <p className="text-gray-600 mb-4">{product.description}</p>
-                    
+
                     {/* 월간/연간 결제 선택 토글 - AI 제품만 표시 */}
                     {['perplexity', 'claude', 'chatgpt'].includes(product.id) && (
                       <div className="mb-4">
                         <div className="flex items-center justify-start gap-3 mb-2">
                           <span className={`text-sm font-medium ${getBillingCycle(product.id) === 'monthly' ? 'text-blue-600' : 'text-gray-500'}`}>월별 결제</span>
-                          <div 
-                            className="relative inline-flex h-5 w-10 items-center rounded-full bg-gray-200 transition-colors focus:outline-none data-[state=checked]:bg-blue-600" 
+                          <div
+                            className="relative inline-flex h-5 w-10 items-center rounded-full bg-gray-200 transition-colors focus:outline-none data-[state=checked]:bg-blue-600"
                             onClick={() => toggleBillingCycle(product.id)}
                           >
                             <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${getBillingCycle(product.id) === 'yearly' ? 'translate-x-5.5' : 'translate-x-1'}`} />
@@ -729,15 +764,15 @@ const handleAddToCart = (product: ProductType) => {
                         </div>
                       </div>
                     )}
-                    
+
                     <div className="mb-4">
                       <h3 className="font-semibold text-gray-700 mb-2">플랜 선택</h3>
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-2 mb-2">
                         {product.plans.map(plan => (
                           <button
                             key={plan.id}
                             onClick={() => handlePlanSelect(product.id, plan.id)}
-                            className={`px-3 py-1.5 text-sm rounded-full transition-colors ${
+                            className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm rounded-full transition-colors ${
                               selectedPlans[product.id] === plan.id
                                 ? 'bg-blue-100 text-blue-700 ring-1 ring-blue-300'
                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -747,7 +782,7 @@ const handleAddToCart = (product: ProductType) => {
                               (() => {
                                 // 월간 결제 옵션이 있는 제품인지 확인
                                 const hasMonthlyOption = ['perplexity', 'claude', 'chatgpt'].includes(product.id);
-                                
+
                                 // 월별 결제인 경우
                                 if (hasMonthlyOption && getBillingCycle(product.id) === 'monthly' && 'monthlyPrice' in plan && typeof plan.monthlyPrice === 'number') {
                                   return `${plan.monthlyPrice.toLocaleString()}원/월`;
@@ -764,21 +799,21 @@ const handleAddToCart = (product: ProductType) => {
                         ))}
                       </div>
                     </div>
-                    
+
                     <div className="mb-4">
                       <h3 className="font-semibold text-gray-700 mb-2">주요 기능</h3>
-                      <ul className="grid grid-cols-2 gap-x-2 gap-y-1">
+                      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-2 gap-y-1">
                         {(() => {
                           const selectedPlanId = selectedPlans[product.id] || product.plans[0].id;
                           const selectedPlan = product.plans.find(plan => plan.id === selectedPlanId);
-                          
+
                           // 플랜의 기능 목록 가져오기
                           let featuresToShow: string[] = [];
-                          
+
                           if (selectedPlan && 'features' in selectedPlan && Array.isArray(selectedPlan.features)) {
                             featuresToShow = selectedPlan.features;
                           }
-                          
+
                           if (featuresToShow.length > 0) {
                             // 선택된 플랜의 기능 목록이 있는 경우
                             return featuresToShow.map((feature: string, idx: number) => (
@@ -804,19 +839,30 @@ const handleAddToCart = (product: ProductType) => {
                       }
                       </ul>
                     </div>
-                    
+
                     <div className="flex items-center gap-2 mb-4">
                       <div className="flex-1 flex items-center border rounded-lg overflow-hidden">
-                        <button 
+                        <button
                           onClick={() => handleQuantityChange(product.id, -1)}
                           className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
                         >
                           -
                         </button>
-                        <div className="flex-1 text-center py-2">
-                          {quantities[product.id] || 1}
-                        </div>
-                        <button 
+                        <input
+                          type="number"
+                          min="1"
+                          value={quantities[product.id] || 1}
+                          onChange={(e) => {
+                            const newValue = parseInt(e.target.value) || 1;
+                            setQuantities(prev => ({
+                              ...prev,
+                              [product.id]: Math.max(1, newValue)
+                            }));
+                          }}
+                          className="flex-1 text-center py-2 focus:outline-none"
+                          data-component-name="ProductsPage"
+                        />
+                        <button
                           onClick={() => handleQuantityChange(product.id, 1)}
                           className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
                         >
@@ -829,22 +875,22 @@ const handleAddToCart = (product: ProductType) => {
                       const selectedPlanId = selectedPlans[product.id] || product.plans[0].id;
                       const selectedPlan = product.plans.find(plan => plan.id === selectedPlanId);
                       const quantity = quantities[product.id] || 1;
-                      
+
                       if (!selectedPlan) return null;
-                      
+
                       // 가격 계산
                       let price = selectedPlan.price;
                       const hasMonthlyOption = ['perplexity', 'claude', 'chatgpt'].includes(product.id);
                       const currentBillingCycle = getBillingCycle(product.id);
-                      
+
                       if (hasMonthlyOption && currentBillingCycle === 'monthly' && 'monthlyPrice' in selectedPlan && typeof selectedPlan.monthlyPrice === 'number') {
                         price = selectedPlan.monthlyPrice;
                       } else if (currentBillingCycle === 'yearly' && 'yearlyPrice' in selectedPlan && typeof selectedPlan.yearlyPrice === 'number') {
                         price = selectedPlan.yearlyPrice;
                       }
-                      
+
                       const totalPrice = price * quantity;
-                      
+
                       return (
                         <div className="mb-3 text-center">
                           <span className="font-semibold text-blue-700">계산된 견적 가격: {totalPrice.toLocaleString()}원</span>
@@ -867,10 +913,10 @@ const handleAddToCart = (product: ProductType) => {
               ))}
           </div>
         </div>
-        
+
         {/* 기타 제품 섹션 */}
         <h2 className="text-2xl font-bold mb-4 text-center">교육용 툴 및 서비스</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-12">
           {products
             .filter(product => !['perplexity', 'claude', 'chatgpt'].includes(product.id))
             .map((product) => (
@@ -889,19 +935,19 @@ const handleAddToCart = (product: ProductType) => {
                   className="transition-transform duration-500 hover:scale-105"
                 />
               </div>
-              
+
               <div className="p-6 flex-grow">
                 <h2 className="text-xl font-bold mb-2 text-gray-800">{product.name}</h2>
                 <p className="text-gray-600 mb-4">{product.description}</p>
-                
+
                 <div className="mb-4">
                   <h3 className="font-semibold text-gray-700 mb-2">플랜 선택</h3>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2 mb-2">
                     {product.plans.map(plan => (
                       <button
                         key={plan.id}
                         onClick={() => handlePlanSelect(product.id, plan.id)}
-                        className={`px-3 py-1.5 text-sm rounded-full transition-colors ${
+                        className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm rounded-full transition-colors ${
                           selectedPlans[product.id] === plan.id
                             ? 'bg-blue-100 text-blue-700 ring-1 ring-blue-300'
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -911,7 +957,7 @@ const handleAddToCart = (product: ProductType) => {
                           (() => {
                             // 월간 결제 옵션이 있는 제품인지 확인 (Perplexity, Claude, ChatGPT만 적용)
                             const hasMonthlyOption = ['perplexity', 'claude', 'chatgpt'].includes(product.id);
-                            
+
                             // 월별 결제인 경우 (월간 옵션이 있는 제품만)
                             if (hasMonthlyOption && getBillingCycle(product.id) === 'monthly' && 'monthlyPrice' in plan && typeof plan.monthlyPrice === 'number') {
                               return `${plan.monthlyPrice.toLocaleString()}원/월`;
@@ -928,21 +974,21 @@ const handleAddToCart = (product: ProductType) => {
                     ))}
                   </div>
                 </div>
-                
+
                 <div className="mb-4">
                   <h3 className="font-semibold text-gray-700 mb-2">주요 기능</h3>
-                  <ul className="grid grid-cols-2 gap-x-2 gap-y-1">
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-2 gap-y-1">
                     {(() => {
                       const selectedPlanId = selectedPlans[product.id] || product.plans[0].id;
                       const selectedPlan = product.plans.find(plan => plan.id === selectedPlanId);
-                      
+
                       // 플랜의 기능 목록 가져오기
                       let featuresToShow: string[] = [];
-                      
+
                       if (selectedPlan && 'features' in selectedPlan && Array.isArray(selectedPlan.features)) {
                         featuresToShow = selectedPlan.features;
                       }
-                      
+
                       if (featuresToShow.length > 0) {
                         // 선택된 플랜의 기능 목록이 있는 경우
                         return featuresToShow.map((feature: string, idx: number) => (
@@ -974,24 +1020,36 @@ const handleAddToCart = (product: ProductType) => {
                   )}
                 </div>
               </div>
-              
+
               <div className="px-6 pb-6">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-sm font-medium text-gray-700">수량:</span>
                   <div className="flex items-center border rounded-lg overflow-hidden">
-                    <button 
+                    <button
                       className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700"
                       onClick={() => handleQuantityChange(product.id, -1)}
                       disabled={product.id === 'padlet' && selectedPlans[product.id] === 'school' && (quantities[product.id] || 10) <= 10}
                     >
                       -
                     </button>
-                    <span className="w-10 text-center">
-                      {product.id === 'padlet' && selectedPlans[product.id] === 'school' 
-                        ? Math.max(10, quantities[product.id] || 10) 
+                    <input
+                      type="number"
+                      min={product.id === 'padlet' && selectedPlans[product.id] === 'school' ? 10 : 1}
+                      value={product.id === 'padlet' && selectedPlans[product.id] === 'school'
+                        ? Math.max(10, quantities[product.id] || 10)
                         : quantities[product.id] || 1}
-                    </span>
-                    <button 
+                      onChange={(e) => {
+                        const newValue = parseInt(e.target.value) || 1;
+                        const minValue = product.id === 'padlet' && selectedPlans[product.id] === 'school' ? 10 : 1;
+                        setQuantities(prev => ({
+                          ...prev,
+                          [product.id]: Math.max(minValue, newValue)
+                        }));
+                      }}
+                      className="w-10 text-center focus:outline-none"
+                      data-component-name="ProductsPage"
+                    />
+                    <button
                       className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700"
                       onClick={() => handleQuantityChange(product.id, 1)}
                       disabled={product.id === 'padlet' && selectedPlans[product.id] === 'classroom' && (quantities[product.id] || 2) >= 9}
@@ -1004,20 +1062,20 @@ const handleAddToCart = (product: ProductType) => {
                 {(() => {
                   const selectedPlanId = selectedPlans[product.id] || product.plans[0].id;
                   const selectedPlan = product.plans.find(plan => plan.id === selectedPlanId);
-                  const quantity = product.id === 'padlet' && selectedPlanId === 'school' 
-                    ? Math.max(10, quantities[product.id] || 10) 
+                  const quantity = product.id === 'padlet' && selectedPlanId === 'school'
+                    ? Math.max(10, quantities[product.id] || 10)
                     : quantities[product.id] || 1;
-                  
+
                   if (!selectedPlan) return null;
-                  
+
                   // 가격 계산
                   let price = selectedPlan.price;
                   let totalPrice = price;
-                  
+
                   if ('yearlyPrice' in selectedPlan && typeof selectedPlan.yearlyPrice === 'number') {
                     price = selectedPlan.yearlyPrice;
                   }
-                  
+
                   // Padlet 강의실 플랜의 경우 특별 가격 계산 로직
                   if (product.id === 'padlet' && selectedPlanId === 'classroom') {
                     // 기본 가격 300,000원 (교사 2명, 학생 200명)
@@ -1031,7 +1089,7 @@ const handleAddToCart = (product: ProductType) => {
                   } else {
                     totalPrice = price * quantity;
                   }
-                  
+
                   // Padlet 강의실 플랜의 경우 교사 수와 학생 수 표시
                   if (product.id === 'padlet' && selectedPlanId === 'classroom') {
                     const baseQuantity = 2; // 기본 교사 수
@@ -1040,7 +1098,7 @@ const handleAddToCart = (product: ProductType) => {
                     const additionalTeachers = Math.max(0, limitedQuantity - baseQuantity); // 추가 교사 수 (최대 7명)
                     const totalTeachers = baseQuantity + additionalTeachers;
                     const totalStudents = 200 + (additionalTeachers * 100); // 기본 200명 + 추가 교사당 100명
-                    
+
                     return (
                       <div className="mb-3 text-center">
                         <span className="font-semibold text-blue-700">계산된 견적 가격: {totalPrice.toLocaleString()}원</span>
@@ -1070,7 +1128,7 @@ const handleAddToCart = (product: ProductType) => {
             </div>
           ))}
         </div>
-        
+
         <div className="mt-16 text-center">
           <h2 className="text-2xl font-bold mb-4">맞춤형 견적이 필요하신가요?</h2>
           <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
@@ -1121,10 +1179,10 @@ const handleAddToCart = (product: ProductType) => {
           )}
         </div>
       </div>
-      
+
       {/* 장바구니 버튼 */}
       <CartButton onClick={() => setIsCartOpen(true)} />
-      
+
       {/* 장바구니 드로어 */}
       <CartDrawer open={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </>

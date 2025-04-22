@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { supabase } from '@/utils/supabase';
 
 // Airtable API 토큰 및 베이스 ID
 const AIRTABLE_PERSONAL_ACCESS_TOKEN = 'patAyhGbJFTVsTTkf.6da6ef653137d7e483aa9f743ff517ef79e090dfba8e8f86ddbd266a4ea18c71'; // 실제 Airtable Personal Access Token 사용
@@ -123,11 +124,75 @@ export async function POST(request: Request) {
       
       console.log('Airtable API success parsed:', result);
       
-      return NextResponse.json({
-        success: true,
-        message: '주문이 성공적으로 접수되었습니다.',
-        data: result
-      });
+      // Supabase에도 주문 데이터 저장
+      try {
+        console.log('테스트 주문: Supabase에 주문 데이터 저장 시도');
+        
+        // 주문 번호 생성 (YYYYMMDD-XXXX 형식)
+        const now = new Date();
+        const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+        const randomNum = Math.floor(1000 + Math.random() * 9000); // 1000-9999 사이의 랜덤 숫자
+        const orderNumber = `${dateStr}-${randomNum}`;
+        
+        // 사용자 정보 확인
+        const { data: sessionData } = await supabase.auth.getSession();
+        const userId = sessionData?.session?.user?.id;
+        console.log('테스트 주문: 사용자 세션 정보:', { 
+          hasSession: !!sessionData?.session,
+          userId: userId || 'null',
+          userEmail: sessionData?.session?.user?.email || 'null'
+        });
+        
+        // 주문 데이터 저장 전 로그
+        const orderData = {
+          order_number: orderNumber,
+          user_id: userId || null,
+          customer_name: customerInfo.name,
+          customer_email: customerInfo.email,
+          customer_phone: customerInfo.phone,
+          customer_school: customerInfo.school,
+          additional_info: customerInfo.additionalInfo || '',
+          items: orderItems,
+          total_amount: totalAmount,
+          status: 'completed',
+          created_at: now.toISOString()
+        };
+        console.log('테스트 주문: Supabase에 저장할 데이터:', orderData);
+        
+        // 주문 데이터 저장
+        const { data: insertedData, error: orderError } = await supabase
+          .from('orders')
+          .insert(orderData)
+          .select();
+        
+        if (orderError) {
+          console.error('테스트 주문: Supabase orders 테이블 저장 오류:', orderError);
+          console.error('테스트 주문: 오류 상세 정보:', {
+            code: orderError.code,
+            message: orderError.message,
+            details: orderError.details,
+            hint: orderError.hint
+          });
+          // Supabase 오류가 발생해도 Airtable 저장은 성공했으니 성공 응답 반환
+        } else {
+          console.log('테스트 주문: Supabase 저장 성공:', insertedData);
+        }
+        
+        return NextResponse.json({
+          success: true,
+          message: '주문이 성공적으로 접수되었습니다.',
+          data: result,
+          orderNumber: orderNumber
+        });
+      } catch (supabaseError) {
+        console.error('Supabase 저장 오류:', supabaseError);
+        // Supabase 오류가 발생해도 Airtable 저장은 성공했으니 성공 응답 반환
+        return NextResponse.json({
+          success: true,
+          message: '주문이 성공적으로 접수되었습니다.',
+          data: result
+        });
+      }
     } catch (fetchError: any) {
       console.error('Airtable fetch error:', {
         error: fetchError,

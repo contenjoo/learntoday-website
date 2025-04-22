@@ -60,10 +60,10 @@ export default function Home() {
             <p className="text-3xl font-normal text-gray-900">
               선생님의 역량을 돕는 혁신 솔루션
             </p>
-            <p className="mt-4 max-w-2xl text-lg text-gray-600 mx-auto whitespace-nowrap">오늘배움은 교사의 시간과 역량을 존중하며, 교육자들이 본연의 역할에 집중할 수 있도록 지원합니다.</p>
+            <p className="mt-4 max-w-2xl text-lg text-gray-600 mx-auto">오늘배움은 교사의 시간과 역량을 존중하며, 교육자들이 본연의 역할에 집중할 수 있도록 지원합니다.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
             {/* Feature 1 - Card Style */}
             <div className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
               <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-4">
@@ -128,7 +128,7 @@ export default function Home() {
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
             오늘배움과 함께 학생들의 미래를 위한 혁신적인 교육 환경을 조성해보세요.
           </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4 max-w-md mx-auto">
+          <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 max-w-md mx-auto">
             <button
               onClick={openDemoScheduler}
               className="px-6 py-3 rounded-full text-base font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-200 shadow-sm"
