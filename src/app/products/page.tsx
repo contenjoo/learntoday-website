@@ -143,7 +143,7 @@ const products = [
           const studentCount = Math.floor(students);
 
           // 디버깅용 로그
-          console.log(`학생 수: ${studentCount}, 계산 전`);
+
 
           let price = 0;
           if (studentCount >= 1 && studentCount <= 299) {
@@ -161,7 +161,7 @@ const products = [
           }
 
           // 디버깅용 로그 - 가격 계산 확인
-          console.log(`calculatePrice 함수 계산된 가격: ${price.toLocaleString()}원 (학생 수: ${studentCount}명)`);
+
 
           return price;
         },
@@ -765,9 +765,6 @@ export default function ProductsPage() {
     // 정수로 변환하여 정확한 경계값 처리 (최소 1명)
     const studentCount = Math.max(1, Math.floor(value));
 
-    // 디버깅용 로그
-    console.log(`handleStudentCountChange 호출: 학생 수 ${studentCount}명`);
-
     // 학생 수 상태 업데이트
     setStudentCounts(prev => ({
       ...prev,
@@ -783,17 +780,11 @@ export default function ProductsPage() {
           // 학생 수에 따른 가격 계산
           const price = schoolPlan.calculatePrice(studentCount);
 
-          // 디버깅용 로그
-          console.log(`계산된 가격: ${price.toLocaleString()}원 (학생 수: ${studentCount}명)`);
-
           // 즉시 가격 상태 업데이트 - 비동기 처리 제거
-          setCustomPrices(prev => {
-            console.log(`가격 상태 업데이트: ${price.toLocaleString()}원`);
-            return {
-              ...prev,
-              [productId]: price
-            };
-          });
+          setCustomPrices(prev => ({
+            ...prev,
+            [productId]: price
+          }));
         }
       }
     }
@@ -820,7 +811,7 @@ type ProductType = {
   features: string[];
 };
 
-const handleAddToCart = (product: ProductType) => {
+const handleAddToCart = (product: ProductType, schoolType?: string, studentCount?: number) => {
     const selectedPlanId = selectedPlans[product.id] || product.plans[0].id;
     const selectedPlan = product.plans.find(plan => plan.id === selectedPlanId);
     const quantity = quantities[product.id] || 1;
@@ -830,32 +821,73 @@ const handleAddToCart = (product: ProductType) => {
     // 선택된 결제 주기에 따라 가격 설정
     let price = selectedPlan.price;
 
+    // Mizou 학교 플랜인 경우 계산된 가격 사용
+    if (product.id === 'mizou' && selectedPlanId === 'school' && customPrices[product.id]) {
+      price = customPrices[product.id];
+
+      // 학생 수에 따른 학교 유형 결정 (schoolType이 전달되지 않은 경우)
+      if (!schoolType) {
+        const count = studentCount || studentCounts[product.id] || 300;
+        if (count >= 1 && count <= 299) {
+          schoolType = '학교 A';
+        } else if (count >= 300 && count <= 3000) {
+          schoolType = '학교 B';
+        } else if (count >= 3001 && count <= 6000) {
+          schoolType = '학교 C';
+        } else if (count >= 6001 && count <= 10000) {
+          schoolType = '학교 D';
+        } else {
+          schoolType = '학교 D+';
+        }
+
+        // studentCount가 전달되지 않은 경우 상태에서 가져옴
+        if (!studentCount) {
+          studentCount = studentCounts[product.id] || 300;
+        }
+      }
+    }
     // 월간 결제 옵션이 있는 제품인지 확인 (Perplexity, Claude, ChatGPT만 적용)
-    const hasMonthlyOption = ['perplexity', 'claude', 'chatgpt'].includes(product.id);
-    const currentBillingCycle = getBillingCycle(product.id);
-
-    // 월별 결제인 경우 monthlyPrice 사용 (월간 옵션이 있는 제품만)
-    if (hasMonthlyOption && currentBillingCycle === 'monthly' && 'monthlyPrice' in selectedPlan && typeof selectedPlan.monthlyPrice === 'number') {
-      price = selectedPlan.monthlyPrice;
-    }
-    // 연간 결제인 경우 yearlyPrice 사용
-    else if (currentBillingCycle === 'yearly' && 'yearlyPrice' in selectedPlan && typeof selectedPlan.yearlyPrice === 'number') {
-      price = selectedPlan.yearlyPrice;
+    else if (['perplexity', 'claude', 'chatgpt'].includes(product.id)) {
+      const billingCycle = getBillingCycle(product.id);
+      price = billingCycle === 'monthly' ? selectedPlan.monthlyPrice || price : selectedPlan.yearlyPrice || price;
     }
 
-    // 구독형 상품은 plan을 'month' 또는 'year'로 명확히 지정
+    // 수량에 따른 가격 계산 (최소 수량이 있는 경우만)
+    if (selectedPlan.minQuantity && selectedPlan.minQuantity > 1) {
+      price = price * quantity;
+    }
+
     let planValue = selectedPlan.name;
     if (['perplexity', 'claude', 'chatgpt'].includes(product.id)) {
       const billingCycle = getBillingCycle(product.id);
       planValue = billingCycle === 'monthly' ? 'month' : 'year';
     }
+
+    // Mizou 학교 플랜인 경우 planValue를 명시적으로 '학교 플랜'으로 설정
+    if (product.id === 'mizou' && selectedPlanId === 'school') {
+      planValue = '학교 플랜';
+    }
+
+    // 로컬 스토리지에서 학교 유형과 학생 수 정보 가져오기 (직접 전달되지 않은 경우)
+    if (product.id === 'mizou' && selectedPlanId === 'school' && !schoolType) {
+      schoolType = localStorage.getItem(`mizou_school_type_${product.id}`) || '';
+      const storedStudentCount = localStorage.getItem(`mizou_student_count_${product.id}`);
+      studentCount = storedStudentCount ? parseInt(storedStudentCount) : undefined;
+    }
+
+    // Mizou 학교 플랜인 경우 학교 유형과 학생 수 정보 확인
+    if (product.id === 'mizou' && selectedPlanId === 'school') {
+    }
+
     const newItem = {
       id: product.id,
       name: product.name,
       price: price,
       image_url: product.image,
       plan: planValue,
-      quantity: quantity
+      quantity: quantity,
+      schoolType: product.id === 'mizou' && selectedPlanId === 'school' ? schoolType : undefined,
+      studentCount: product.id === 'mizou' && selectedPlanId === 'school' ? studentCount : undefined
     };
 
     dispatch({
@@ -875,7 +907,7 @@ const handleAddToCart = (product: ProductType) => {
         onClose={() => setIsMiniCartVisible(false)}
         onViewCart={() => setIsCartOpen(true)}
         newItemAdded={lastAddedItem}
-      />,
+      />
       {/* Airtable 팝업 모달 */}
       {isQuoteModalOpen && (
         <div
@@ -932,12 +964,14 @@ const handleAddToCart = (product: ProductType) => {
                   className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col"
                   style={{ boxShadow: 'rgba(60,64,67,0.15) 0px 1px 3px 1px' }}
                 >
-                  <div className="relative h-48 overflow-hidden">
+                  <div className="relative h-48 overflow-hidden bg-white">
                     <Image
                       src={product.image}
                       alt={product.name}
                       fill
-                      style={{ objectFit: 'cover' }}
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      quality={100}
+                      style={{ objectFit: 'contain', padding: '10px' }}
                       className="transition-transform duration-500 hover:scale-105"
                     />
                   </div>
@@ -1082,15 +1116,23 @@ const handleAddToCart = (product: ProductType) => {
                             <MizouPriceCalculator
                               initialStudentCount={studentCounts[product.id] || 300}
                               onStudentCountChange={(count) => handleStudentCountChange(product.id, count)}
-                              onAddToCart={(price) => {
+                              onAddToCart={(price, schoolType, studentCount) => {
                                 // 가격 저장 후 장바구니에 추가
                                 setCustomPrices(prev => ({
                                   ...prev,
                                   [product.id]: price
                                 }));
 
+                                // 학교 유형과 학생 수 정보 저장
+                                localStorage.setItem(`mizou_school_type_${product.id}`, schoolType);
+                                localStorage.setItem(`mizou_student_count_${product.id}`, studentCount.toString());
+
+
+
+
+
                                 // 장바구니에 추가 - 전체 product 객체 전달
-                                handleAddToCart(product);
+                                handleAddToCart(product, schoolType, studentCount);
                               }}
                             />
                           </div>
@@ -1144,13 +1186,14 @@ const handleAddToCart = (product: ProductType) => {
               className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col"
               style={{ boxShadow: 'rgba(60,64,67,0.15) 0px 1px 3px 1px' }}
             >
-              <div className="relative h-48 overflow-hidden">
+              <div className="relative h-48 overflow-hidden bg-white">
                 <Image
                   src={product.image}
                   alt={product.name}
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  style={{ objectFit: 'cover' }}
+                  quality={100}
+                  style={{ objectFit: 'contain', padding: '10px' }}
                   className="transition-transform duration-500 hover:scale-105"
                 />
               </div>

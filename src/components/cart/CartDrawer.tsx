@@ -65,25 +65,41 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
 
     try {
       // 주문 상품 정보 포맷팅
-      const orderItems = cart.items.map(item => ({
-        product: item.name,
-        plan: item.plan || '',
-        quantity: item.quantity,
-        price: item.price,
-        total: item.price * item.quantity
-      }));
+      const orderItems = cart.items.map(item => {
+        const orderItem = {
+          product: item.name,
+          plan: item.plan || '',
+          quantity: item.quantity,
+          price: item.price,
+          total: item.price * item.quantity
+        };
+
+        // Mizou 학교 플랜인 경우 학교 유형과 학생 수 정보 추가
+        if (item.name === 'Mizou' && item.plan === '학교 플랜' && item.schoolType && item.studentCount) {
+          return {
+            ...orderItem,
+            schoolType: item.schoolType,
+            studentCount: item.studentCount
+          };
+        }
+
+        return orderItem;
+      });
 
       // 주문 상품 문자열 포맷팅 (Airtable OrderItems 필드용)
-      const orderItemsString = cart.items.map(item =>
-        `${item.name}${item.plan ? ` (${item.plan})` : ''} x${item.quantity}`
-      ).join(', ');
+      const orderItemsString = cart.items.map(item => {
+        // 기본 상품 정보
+        let itemString = `${item.name}${item.plan ? ` (${item.plan})` : ''} x${item.quantity}`;
 
-      console.log('Sending order data:', {
-        customerInfo,
-        orderItems,
-        orderItemsString,
-        totalAmount: total
-      });
+        // Mizou 학교 플랜인 경우 학교 유형과 학생 수 정보 추가
+        if (item.name === 'Mizou' && item.plan === '학교 플랜' && item.schoolType && item.studentCount) {
+          itemString += ` - ${item.schoolType} (${item.studentCount.toLocaleString()}명)`;
+        }
+
+        return itemString;
+      }).join(', ');
+
+      // 디버깅 코드 제거
 
       // Airtable API 호출
       const response = await fetch('/api/submit-order', {
@@ -99,12 +115,10 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
         }),
       });
 
-      // 응답 로깅 추가
-      console.log('API Response status:', response.status, response.statusText);
+      // 디버깅 코드 제거
 
       // 응답 본문 가져오기
       const responseData = await response.json();
-      console.log('API Response data:', responseData);
 
       if (!response.ok) {
         // 서버에서 오류 응답이 왔을 때 상세 정보 추출
@@ -142,8 +156,7 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
-          console.log('사용자 로그인 상태:', session.user);
-
+          // 디버깅 코드 제거
           // 사용자 메타데이터에서 정보 가져오기 (프로필 테이블 접근 없이)
           const userMeta = session.user.user_metadata || {};
 
@@ -155,11 +168,6 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
             phone: userMeta.phone || '',
             school: userMeta.school || ''
           }));
-
-          console.log('사용자 정보로 폼 채움:', {
-            name: userMeta.name || userMeta.full_name || '',
-            email: session.user.email || ''
-          });
         }
       } catch (error) {
         console.error('사용자 세션 확인 오류:', error);
@@ -215,7 +223,7 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
             <div className="text-center text-gray-500 mt-16">장바구니가 비어있습니다.</div>
           ) : (
             cart.items.map((item, idx) => {
-              console.log('Rendering cart item:', item);
+              // 디버깅 코드 제거
               // 이미지 URL 처리 - 로고 제거로 인해 더 이상 필요하지 않음
 
               return (
@@ -230,7 +238,17 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
   (item.plan === 'year' || item.plan === '연간') && (
     <div className="text-sm font-bold text-blue-600 mt-1">연간 구독</div>
   )}
-{(item.plan && !((item.name === 'Perplexity' || item.name === 'Perplexity AI' || item.name === 'ChatGPT' || item.name === 'Claude' || item.name === 'Claude AI') && (item.plan === 'month' || item.plan === '월간' || item.plan === 'year' || item.plan === '연간'))) && (
+{/* Mizou 제품이고 학교 플랜인 경우 */}
+{item.name === 'Mizou' && item.plan === '학교 플랜' ? (
+  <>
+    <div className="text-xs text-gray-500">
+      학교 플랜
+    </div>
+    <p className="text-sm text-gray-600 mt-1">
+      {item.schoolType || '학교 플랜'} {item.studentCount ? `(${item.studentCount.toLocaleString()}명)` : ''}
+    </p>
+  </>
+) : (item.plan && !((item.name === 'Perplexity' || item.name === 'Perplexity AI' || item.name === 'ChatGPT' || item.name === 'Claude' || item.name === 'Claude AI') && (item.plan === 'month' || item.plan === '월간' || item.plan === 'year' || item.plan === '연간'))) && (
   <div className="text-xs text-gray-500">{item.plan}</div>
 )}
                     <div className="flex items-center gap-2 mt-2">

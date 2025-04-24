@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 interface MizouPriceCalculatorProps {
   initialStudentCount?: number;
   onStudentCountChange?: (count: number) => void;
-  onAddToCart: (price: number) => void;
+  onAddToCart: (price: number, schoolType: string, studentCount: number) => void;
 }
 
 export default function MizouPriceCalculator({
@@ -78,7 +78,7 @@ export default function MizouPriceCalculator({
       onStudentCountChange(studentCount);
     }
 
-    console.log(`학생 수: ${studentCount}명, 가격: ${newPrice.toLocaleString()}원, 유형: ${newSchoolType}`);
+    // 디버깅 코드 제거
   }, [studentCount, onStudentCountChange]);
 
   // 학생 수 증가 핸들러
@@ -101,7 +101,14 @@ export default function MizouPriceCalculator({
 
   // 장바구니에 추가 핸들러
   const handleAddToCart = () => {
-    onAddToCart(price);
+    // 디버깅 코드 제거
+
+    // 학교 유형과 학생 수 정보를 localStorage에 저장
+    localStorage.setItem('mizou_school_type_mizou', schoolType);
+    localStorage.setItem('mizou_student_count_mizou', studentCount.toString());
+
+    // 부모 컴포넌트의 onAddToCart 함수 호출
+    onAddToCart(price, schoolType, studentCount);
   };
 
   return (

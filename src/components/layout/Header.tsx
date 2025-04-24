@@ -2,9 +2,20 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
+import { useCart } from '@/context/CartContext';
+import { getCartCount } from '@/utils/cart';
+import dynamic from 'next/dynamic';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const { cart } = useCart();
+  const cartCount = getCartCount(cart.items);
+
+  // CartDrawer 컴포넌트를 동적으로 불러오기
+  const CartDrawer = dynamic(() => import('@/components/cart/CartDrawer'), {
+    ssr: false,
+  });
 
   return (
     <header className="bg-white sticky top-0 z-50 shadow-md">
@@ -19,10 +30,12 @@ export default function Header() {
               <Image
                 src="/images/learntoday.png"
                 alt="오늘배움 로고"
-                width={80}
-                height={80}
+                width={172}
+                height={40}
                 priority
-                className="h-16 w-auto"
+                quality={100}
+                className="h-12 w-auto md:h-14 lg:h-16"
+                style={{ objectFit: 'contain' }}
               />
             </Link>
           </div>
@@ -35,6 +48,14 @@ export default function Header() {
             <Link href="/contact" className="text-gray-700 hover:text-blue-600 font-medium">
               문의하기
             </Link>
+            <a 
+              href="https://joo.is" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="px-4 py-2 bg-purple-100 text-purple-800 rounded-full font-medium border border-purple-300 hover:bg-purple-200 transition-colors"
+            >
+              주이즈
+            </a>
             <a 
               href="https://t2c.kr" 
               target="_blank" 
@@ -58,10 +79,29 @@ export default function Header() {
             {/* 통합 로그인/회원가입 버튼 */}
             <Link 
               href="/login" 
-              className="px-4 py-2 bg-blue-600 text-white rounded-full font-medium hover:bg-blue-700 transition-colors"
+              className="px-4 py-2 bg-blue-600 text-white rounded-full font-medium hover:bg-blue-700 transition-colors mr-3"
             >
               로그인/회원가입
             </Link>
+            
+            {/* 장바구니 버튼 */}
+            <button
+              onClick={() => setIsCartOpen(!isCartOpen)}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-full font-medium hover:bg-blue-700 transition-colors relative"
+              aria-label="장바구니 열기"
+            >
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
+                <path d="M6 6h15l-1.68 8.39A2 2 0 0 1 17.36 16H8.64a2 2 0 0 1-1.96-1.61L4 4H2" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <circle cx="9" cy="21" r="1" fill="white"/>
+                <circle cx="19" cy="21" r="1" fill="white"/>
+              </svg>
+              <span>장바구니</span>
+              {cartCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
+            </button>
           </div>
 
           {/* 모바일 메뉴 버튼 */}
@@ -103,6 +143,14 @@ export default function Header() {
             문의하기
           </Link>
           <a 
+            href="https://joo.is" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="block px-3 py-2 text-base font-medium text-purple-800 bg-purple-100 hover:bg-purple-200 rounded-md border border-purple-300 mb-2"
+          >
+            주이즈
+          </a>
+          <a 
             href="https://t2c.kr" 
             target="_blank" 
             rel="noopener noreferrer"
@@ -119,12 +167,38 @@ export default function Header() {
           
           {/* 통합 로그인/회원가입 버튼 */}
           <div className="px-3 py-2">
-            <Link href="/login" className="w-full text-center block px-4 py-2 border border-transparent rounded-md text-white bg-blue-600 hover:bg-blue-700">
+            <Link href="/login" className="w-full text-center block px-4 py-2 border border-transparent rounded-md text-white bg-blue-600 hover:bg-blue-700 mb-2">
               로그인/회원가입
             </Link>
           </div>
+          
+          {/* 모바일 장바구니 버튼 */}
+          <div className="px-3 py-2">
+            <button
+              onClick={() => {
+                setIsCartOpen(!isCartOpen);
+                setIsMenuOpen(false);
+              }}
+              className="w-full text-center flex items-center justify-center gap-2 px-4 py-2 border border-transparent rounded-md text-white bg-blue-600 hover:bg-blue-700"
+            >
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
+                <path d="M6 6h15l-1.68 8.39A2 2 0 0 1 17.36 16H8.64a2 2 0 0 1-1.96-1.61L4 4H2" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <circle cx="9" cy="21" r="1" fill="white"/>
+                <circle cx="19" cy="21" r="1" fill="white"/>
+              </svg>
+              <span>장바구니</span>
+              {cartCount > 0 && (
+                <span className="ml-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
+            </button>
+          </div>
         </div>
       </div>
+      
+      {/* 장바구니 드로어 */}
+      <CartDrawer open={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </header>
   );
 }

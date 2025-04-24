@@ -35,21 +35,33 @@ export async function POST(request: Request) {
         'PhoneNumber': customerInfo.phone,
         'Email': customerInfo.email,
         'AdditionalInfo': customerInfo.additionalInfo || '',
-        'OrderItems': orderItemsString || orderItems.map(item => `${item.product || item.name} ${item.plan ? `(${item.plan})` : ''} x${item.quantity}`).join(', '),
+        'OrderItems': orderItemsString || orderItems.map(item => {
+          let itemString = `${item.product || item.name} ${item.plan ? `(${item.plan})` : ''} x${item.quantity}`;
+
+          // Mizou 학교 플랜인 경우 학교 유형과 학생 수 정보 추가
+          if ((item.product === 'Mizou' || item.name === 'Mizou') &&
+              (item.plan === '학교 플랜') &&
+              item.schoolType &&
+              item.studentCount) {
+            itemString += ` - ${item.schoolType} (${item.studentCount.toLocaleString()}명)`;
+          }
+
+          return itemString;
+        }).join(', '),
         'TotalAmount': totalAmount,
         'OrderDate': new Date().toISOString()
       }
     };
-    
+
     const records = [record];
 
     // Airtable API 호출 전 데이터 로깅
-    console.log('Sending to Airtable:', { 
-      url: AIRTABLE_API_URL, 
+    console.log('Sending to Airtable:', {
+      url: AIRTABLE_API_URL,
       headers: { ...headers, 'Authorization': 'Bearer [REDACTED]' }, // 토큰 가리기
-      records 
+      records
     });
-    
+
     try {
       // API 키 사용 (이전 방식)
       const response = await fetch(AIRTABLE_API_URL, {
@@ -60,22 +72,22 @@ export async function POST(request: Request) {
         },
         body: JSON.stringify({ records }),
       });
-      
+
       // 응답 상태 코드 로깅
       console.log(`Airtable API response status: ${response.status} ${response.statusText}`);
-      
+
       // 응답 헤더 로깅
       const responseHeaders: Record<string, string> = {};
       response.headers.forEach((value, key) => {
         responseHeaders[key] = value;
       });
       console.log('Airtable API response headers:', responseHeaders);
-    
+
       // 응답 처리
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Airtable API error response text:', errorText);
-        
+
         let errorData;
         try {
           errorData = JSON.parse(errorText);
@@ -84,10 +96,10 @@ export async function POST(request: Request) {
           console.error('Failed to parse Airtable error response:', e);
           errorData = { text: errorText };
         }
-        
+
         // 에러 코드에 따른 다른 에러 메시지
         let errorMessage = 'Airtable API 오류가 발생했습니다.';
-        
+
         if (response.status === 401 || response.status === 403) {
           errorMessage = 'Airtable 인증 오류: 토큰이 유효하지 않거나 권한이 부족합니다.';
         } else if (response.status === 422) {
@@ -97,10 +109,10 @@ export async function POST(request: Request) {
         } else if (response.status >= 500) {
           errorMessage = 'Airtable 서버 오류: 잠시 후 다시 시도해주세요.';
         }
-        
+
         return NextResponse.json(
-          { 
-            error: errorMessage, 
+          {
+            error: errorMessage,
             details: errorData,
             status: response.status,
             statusText: response.statusText
@@ -108,11 +120,11 @@ export async function POST(request: Request) {
           { status: 500 }
         );
       }
-    
+
       // 성공 응답 처리
       const responseText = await response.text();
       console.log('Airtable API success response:', responseText);
-      
+
       let result;
       try {
         result = JSON.parse(responseText);
@@ -120,9 +132,9 @@ export async function POST(request: Request) {
         console.error('Failed to parse Airtable success response:', e);
         result = { text: responseText };
       }
-      
+
       console.log('Airtable API success parsed:', result);
-      
+
       return NextResponse.json({
         success: true,
         message: '주문이 성공적으로 접수되었습니다.',
@@ -134,18 +146,18 @@ export async function POST(request: Request) {
         message: fetchError instanceof Error ? fetchError.message : String(fetchError),
         code: fetchError.code
       });
-      
+
       // 네트워크 오류 메시지 추출
       let errorMessage = 'Airtable API 호출 중 오류가 발생했습니다.';
-      
+
       if (fetchError.code === 'ECONNREFUSED') {
         errorMessage = 'Airtable 서버에 연결할 수 없습니다. 네트워크 연결을 확인해주세요.';
       } else if (fetchError.code === 'ETIMEDOUT') {
         errorMessage = 'Airtable 서버 연결 시간이 초과되었습니다.';
       }
-      
+
       return NextResponse.json(
-        { 
+        {
           error: errorMessage,
           details: fetchError instanceof Error ? fetchError.message : String(fetchError),
           code: fetchError.code,
@@ -154,7 +166,7 @@ export async function POST(request: Request) {
         { status: 500 }
       );
     }
-    
+
   } catch (error: any) {
     // 상세 에러 정보 및 요청 데이터까지 로깅
     console.error('Detailed order submission error:', {
@@ -168,7 +180,7 @@ export async function POST(request: Request) {
 
     // 네트워크 오류 메시지 추출
     let errorMessage = '주문 처리 중 오류가 발생했습니다. 다시 시도해주세요.';
-    
+
     if (error.code === 'ECONNREFUSED') {
       errorMessage = 'Airtable 서버에 연결할 수 없습니다. 네트워크 연결을 확인해주세요.';
     } else if (error.code === 'ETIMEDOUT') {
@@ -176,7 +188,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json(
-      { 
+      {
         error: errorMessage,
         details: error instanceof Error ? error.message : error,
         code: error.code,
