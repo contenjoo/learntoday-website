@@ -1,0 +1,15 @@
+# robots.txt for learntoday.co.kr
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://learntoday.co.kr/sitemap.xml
+
+# Disallow admin and private areas
+Disallow: /admin/
+Disallow: /private*/
+Disallow: /api/
+
+# Naver Yeti crawler specific rules
+User-agent: Yeti
+Allow: /

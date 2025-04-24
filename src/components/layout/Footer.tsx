@@ -28,7 +28,7 @@ export default function Footer() {
             <p className="text-sm text-gray-600 mb-2">교육 기관을 위한 AI 및 디지털 기술 기반 솔루션</p>
             <p className="text-sm text-gray-600">혁신적인 교육 환경을 만들어갑니다</p>
           </div>
-          
+
           <div>
             <h3 className="text-sm font-medium text-gray-900 mb-4">제품</h3>
             <ul className="space-y-2">
@@ -38,8 +38,8 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <button 
-                  onClick={openDemoScheduler} 
+                <button
+                  onClick={openDemoScheduler}
                   className="text-sm text-gray-600 hover:text-blue-600 transition-colors duration-200 cursor-pointer bg-transparent border-none p-0 text-left"
                 >
                   1:1 데모 신청하기
@@ -47,18 +47,18 @@ export default function Footer() {
               </li>
             </ul>
           </div>
-          
+
           <div>
             <h3 className="text-sm font-medium text-gray-900 mb-4">회사 정보</h3>
             <ul className="space-y-2">
               <li className="text-sm text-gray-600">사업자등록번호: 313-86-02193</li>
               <li className="text-sm text-gray-600">대표: 주방현</li>
-              <li className="text-sm text-gray-600">주소(본사): 대전광역시 유성구 지족로351 402호</li>
-              <li className="text-sm text-gray-600">주소(이노베이션센터): 대전광역시 서구 만년로68번길 15-20 6층 613호</li>
+              <li className="text-sm text-gray-600">주소(본사):<br className="sm:hidden" /> 대전광역시 유성구 지족로351 402호</li>
+              <li className="text-sm text-gray-600">주소(이노베이션센터):<br className="sm:hidden" /> 대전광역시 서구 만년로68번길 15-20 6층 613호</li>
               <li className="text-sm text-gray-600">전화: 0507-1316-1571</li>
             </ul>
           </div>
-          
+
           <div>
             <h3 className="text-sm font-medium text-gray-900 mb-4">계정</h3>
             <ul className="space-y-2">
@@ -74,12 +74,12 @@ export default function Footer() {
               </li>
             </ul>
           </div>
-          
+
           <div className="sm:col-span-2 lg:col-span-1">
             <NewsletterForm />
           </div>
         </div>
-        
+
         {/* Bottom section with copyright */}
         <div className="border-t border-gray-100 py-6">
           <YearCopyright />
