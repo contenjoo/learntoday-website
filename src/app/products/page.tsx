@@ -1,12 +1,33 @@
 'use client';
 
 import React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
 import CartButton from '@/components/cart/CartButton';
 import CartDrawer from '@/components/cart/CartDrawer';
 import MiniCartToast from '@/components/cart/MiniCartToast';
+
+// Define types for product plans and products
+interface ProductPlan {
+  id: string;
+  name: string;
+  price: number;
+  monthlyPrice?: number;
+  yearlyPrice?: number;
+  priceDisplay: string;
+  minQuantity?: number;
+  features?: string[];
+}
+
+interface Product {
+  id: string;
+  name: string;
+  description: string;
+  image: string;
+  plans: ProductPlan[];
+  features: string[];
+}
 
 // 제품 데이터
 const products = [
@@ -37,10 +58,10 @@ const products = [
       {
         id: 'school',
         name: '스쿨플랜(최소 400명 이상)',
-        price: 6000,
-        yearlyPrice: 6000,
+        price: 8000,
+        yearlyPrice: 8000,
         minQuantity: 400,
-        priceDisplay: '인당 6,000원/년',
+        priceDisplay: '인당 8,000원/년',
         features: [
           '무료 온보딩 및 트레이닝',
           '전단 계정 관리자',
@@ -215,31 +236,31 @@ const products = [
     plans: [
       { 
         id: 'standard', 
-        name: 'AI Plan', 
-        price: 150000, 
-        priceDisplay: '150,000원/년',
+        name: 'AI 기본 플랜', 
+        price: 190000, 
+        yearlyPrice: 190000,
+        priceDisplay: '190,000원/년',
         features: [
           '10GB 저장 공간',
-          'AI 기반 자동 학습자료 생성',
-          '워크시트 관리',
-          '학생별 진도 추적',
-          '기본 고객 지원',
+          '기본 AI 생성/편집 도구',
+          '무제한 AI 어시스턴트',
+          '평가 및 적응형 자료 제작',
+          '편집자 협업 시스템',
         ]
       },
       { 
         id: 'pro', 
-        name: 'AI Pro Plan', 
-        price: 230000, 
-        priceDisplay: '230,000원/년',
+        name: 'AI PRO 플랜', 
+        price: 290000, 
+        yearlyPrice: 290000,
+        priceDisplay: '290,000원/년',
         features: [
           '50GB 저장 공간',
           'AI 기반 자동 학습자료 생성',
-          '워크시트 관리',
-          '학생별 진도 추적',
-          '개인화 학습자료 제작',
           '우선 고객 지원',
-          '고급 분석 도구',
-          '학습 자료 내보내기',
+          '고급 협업 툴 패키지',
+          'PRO 전용 템플릿 라이브러리',
+          '실시간 성능 분석 리포트',
         ]
       },
     ],
@@ -299,14 +320,70 @@ const products = [
     description: '몰입형 학습 경험 제공 도구',
     image: '/images/thinglink.png',
     plans: [
-      { id: 'teacher-pro', name: 'Teacher Pro', price: 330000, priceDisplay: '330,000원/년' },
-      { id: 'school', name: '학교', price: 0, priceDisplay: '별도문의' },
+      { 
+        id: 'teacher-pro', 
+        name: 'Teacher License Pro', 
+        price: 440000, 
+        priceDisplay: '440,000원/년',
+        features: [
+          '교사 1명과 학생 60명 지원',
+          '인터랙티브 이미지 생성',
+          '비디오 생성',
+          '360°/VR 이미지 생성',
+          '3D 모델 생성',
+          '시나리오 생성'
+        ]
+      },
+      { 
+        id: 'small-school', 
+        name: 'Small School', 
+        price: 1000000, 
+        priceDisplay: '1,000,000원/년',
+        features: [
+          '최대 10명의 교사 및 200명의 학생 창작자 지원',
+          '콘텐츠 업로드 무제한',
+          '임베딩 콘텐츠',
+          '콘텐츠 참여 통계',
+          'ThingLink 로고 제거',
+          '협업 편집'
+        ]
+      },
+      { 
+        id: 'medium-school', 
+        name: 'Medium School', 
+        price: 2500000, 
+        priceDisplay: '2,500,000원/년',
+        features: [
+          '최대 25명의 교사 및 500명의 학생 창작자 지원',
+          'Small School의 모든 기능 포함',
+          '관리자 및 학생 창작자 수용력 증가',
+          '1000개 AI 이미지 생성',
+          '자동 콘텐츠 번역',
+          'Microsoft/Google 통합'
+        ]
+      },
+      { 
+        id: 'unlimited-bundle', 
+        name: 'Unlimited Bundle', 
+        price: 4300000, 
+        priceDisplay: '4,300,000원/년',
+        features: [
+          '무제한 교사 및 학생 창작자 지원',
+          'ThingLink의 모든 제품에 무제한 접근',
+          '학습 분석 연결',
+          'LMS와의 간편한 연동',
+          '3000개 AI 이미지 생성',
+          '지역별 지원'
+        ]
+      },
     ],
     features: [
-      '이미지 상호작용 포인트',
-      '360도 가상 투어',
-      '포트폴리오 개발',
-      '멀티미디어 통합',
+      '인터랙티브 이미지 및 비디오 생성',
+      '360° 가상 투어 및 VR 경험',
+      '3D 모델 통합 및 상호작용',
+      '시나리오 기반 학습 경로 생성',
+      '협업 편집 및 공유 기능',
+      '다양한 LMS 시스템과 통합'
     ],
   },
 
@@ -452,8 +529,12 @@ export default function ProductsPage() {
     phone: '',
     message: '',
   });
+  const [mounted, setMounted] = useState(false);
 
-  // 팝업 열릴 때 body 스크롤 방지
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   React.useEffect(() => {
     if (isQuoteModalOpen) {
       document.body.style.overflow = 'hidden';
@@ -463,7 +544,6 @@ export default function ProductsPage() {
     return () => { document.body.style.overflow = ''; };
   }, [isQuoteModalOpen]);
 
-  // 결제 주기 변경 함수
   const toggleBillingCycle = (productId: string) => {
     setBillingCycles(prev => ({
       ...prev,
@@ -471,50 +551,34 @@ export default function ProductsPage() {
     }));
   };
 
-  // 제품별 결제 주기 가져오기 (기본값은 연간)
   const getBillingCycle = (productId: string): 'monthly' | 'yearly' => {
     return billingCycles[productId] || 'yearly';
   };
 
-  // 플랜 선택 핸들러
   const handlePlanSelect = (productId: string, planId: string) => {
     setSelectedPlans(prev => ({
       ...prev,
       [productId]: planId
     }));
     
-    // 최소 수량이 필요한 플랜 처리
     const product = products.find(p => p.id === productId);
     if (!product) return;
     
     const selectedPlan = product.plans.find(p => p.id === planId);
     if (!selectedPlan) return;
     
-    // 최소 수량 확인
     let minQuantity = 1;
     
-    // Padlet 학교 플랜인 경우 최소 10개
     if (productId === 'padlet' && planId === 'school') {
       minQuantity = 10;
-    }
-    // Claude Team 플랜인 경우 최소 5개
-    else if (productId === 'claude' && planId === 'team') {
+    } else if (productId === 'claude' && planId === 'team') {
       minQuantity = 5;
-    }
-    // ChatGPT Team 플랜인 경우 최소 2개
-    else if (productId === 'chatgpt' && planId === 'team') {
+    } else if (productId === 'chatgpt' && planId === 'team') {
       minQuantity = 2;
-    }
-    // Snorkl Teacher Team 플랜인 경우 최소 5개
-    else if (productId === 'snorkl' && planId === 'teacher-team') {
-      minQuantity = 5;
-    }
-    // 만약 minQuantity 속성이 있는 경우 해당 값 사용
-    else if ('minQuantity' in selectedPlan && typeof selectedPlan.minQuantity === 'number') {
+    } else if ('minQuantity' in selectedPlan && typeof selectedPlan.minQuantity === 'number') {
       minQuantity = selectedPlan.minQuantity;
     }
     
-    // 최소 수량 설정
     setQuantities(prev => {
       const currentQty = prev[productId] || 1;
       return {
@@ -524,24 +588,20 @@ export default function ProductsPage() {
     });
   };
 
-  // 수량 변경 핸들러
   const handleQuantityChange = (productId: string, change: number) => {
     setQuantities(prev => {
       const currentQty = prev[productId] || 1;
       const selectedPlanId = selectedPlans[productId];
       
-      // 최소 수량 설정
       let minQty = 1;
       
-      // 특정 플랜에 대한 최소 수량 설정
       if (productId === 'padlet' && selectedPlanId === 'school') {
-        minQty = 10; // Padlet 학교 플랜인 경우 최소 10개
+        minQty = 10;
       } else if (productId === 'claude' && selectedPlanId === 'team') {
-        minQty = 5; // Claude Team 플랜인 경우 최소 5개
+        minQty = 5;
       } else if (productId === 'chatgpt' && selectedPlanId === 'team') {
-        minQty = 2; // ChatGPT Team 플랜인 경우 최소 2개
+        minQty = 2;
       } else {
-        // 제품과 플랜 찾기
         const product = products.find(p => p.id === productId);
         if (product) {
           const selectedPlan = product.plans.find(plan => plan.id === selectedPlanId);
@@ -551,7 +611,6 @@ export default function ProductsPage() {
         }
       }
       
-      // 현재 수량이 최소 수량보다 작으면 최소 수량으로 설정
       if (currentQty < minQty) {
         return {
           ...prev,
@@ -567,51 +626,48 @@ export default function ProductsPage() {
     });
   };
 
-  // 장바구니 추가 핸들러
-  interface ProductPlan {
-  id: string;
-  name: string;
-  price: number;
-  monthlyPrice?: number;
-  yearlyPrice?: number;
-  priceDisplay: string;
-  minQuantity?: number;
-  features?: string[];
-};
+  const getRedmentaDiscountedPrice = (selectedPlanId: string, quantity: number) => {
+    let basePrice = selectedPlanId === 'standard' ? 190000 : 290000;
+    
+    if (quantity >= 2 && quantity <= 5) {
+      return selectedPlanId === 'standard' ? 180000 : 280000;
+    } else if (quantity >= 6 && quantity <= 19) {
+      return selectedPlanId === 'standard' ? 170000 : 270000;
+    } else if (quantity >= 20) {
+      return null;
+    }
+    
+    return basePrice;
+  };
 
-type ProductType = {
-  id: string;
-  name: string;
-  description: string;
-  image: string;
-  plans: ProductPlan[];
-  features: string[];
-};
-
-const handleAddToCart = (product: ProductType) => {
+  const handleAddToCart = (product: Product) => {
     const selectedPlanId = selectedPlans[product.id] || product.plans[0].id;
-    const selectedPlan = product.plans.find(plan => plan.id === selectedPlanId);
+    const selectedPlan = product.plans.find((plan: ProductPlan) => plan.id === selectedPlanId);
     const quantity = quantities[product.id] || 1;
     
     if (!selectedPlan) return;
     
-    // 선택된 결제 주기에 따라 가격 설정
     let price = selectedPlan.price;
     
-    // 월간 결제 옵션이 있는 제품인지 확인 (Perplexity, Claude, ChatGPT만 적용)
     const hasMonthlyOption = ['perplexity', 'claude', 'chatgpt'].includes(product.id);
     const currentBillingCycle = getBillingCycle(product.id);
     
-    // 월별 결제인 경우 monthlyPrice 사용 (월간 옵션이 있는 제품만)
     if (hasMonthlyOption && currentBillingCycle === 'monthly' && 'monthlyPrice' in selectedPlan && typeof selectedPlan.monthlyPrice === 'number') {
       price = selectedPlan.monthlyPrice;
-    } 
-    // 연간 결제인 경우 yearlyPrice 사용
-    else if (currentBillingCycle === 'yearly' && 'yearlyPrice' in selectedPlan && typeof selectedPlan.yearlyPrice === 'number') {
+    } else if (currentBillingCycle === 'yearly' && 'yearlyPrice' in selectedPlan && typeof selectedPlan.yearlyPrice === 'number') {
       price = selectedPlan.yearlyPrice;
     }
     
-    // 구독형 상품은 plan을 'month' 또는 'year'로 명확히 지정
+    const discountedPrice = getRedmentaDiscountedPrice(selectedPlanId, quantity);
+    
+    if (product.id === 'redmenta') {
+      if (discountedPrice === null) {
+        return;
+      } else {
+        price = discountedPrice;
+      }
+    }
+    
     let planValue = selectedPlan.name;
     if (['perplexity', 'claude', 'chatgpt'].includes(product.id)) {
       const billingCycle = getBillingCycle(product.id);
@@ -631,10 +687,17 @@ const handleAddToCart = (product: ProductType) => {
       product: newItem
     });
     
-    // 미니 장바구니 토스트 표시
     setLastAddedItem(newItem);
     setIsMiniCartVisible(true);
   };
+
+  if (!mounted) {
+    return <div className="container mx-auto px-4 py-8 pb-24 flex justify-center items-center min-h-[60vh]">
+      <div className="animate-pulse text-center">
+        <p className="text-gray-500">로딩 중...</p>
+      </div>
+    </div>;
+  }
 
   return (
     <>
@@ -643,8 +706,7 @@ const handleAddToCart = (product: ProductType) => {
         onClose={() => setIsMiniCartVisible(false)} 
         onViewCart={() => setIsCartOpen(true)}
         newItemAdded={lastAddedItem}
-      />,
-      {/* Airtable 팝업 모달 */}
+      />
       {isQuoteModalOpen && (
         <div
           className="fixed inset-0 z-[1000] flex items-center justify-center"
@@ -686,11 +748,9 @@ const handleAddToCart = (product: ProductType) => {
           <p className="text-lg text-gray-600 max-w-3xl mx-auto whitespace-nowrap">최신 AI 기술과 혁신적인 교육 방법론을 결합한 오늘배움의 에듀테크 제품으로 교육 현장의 혁신을 경험하세요.</p>
         </div>
         
-        {/* AI 제품 섹션 (Perplexity, Claude, ChatGPT) */}
         <div className="mb-12">
           <h2 className="text-2xl font-bold mb-4 text-center">교육용 AI 서비스</h2>
           
-          {/* AI 제품 그리드 */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
             {products
               .filter(product => ['perplexity', 'claude', 'chatgpt'].includes(product.id))
@@ -714,7 +774,6 @@ const handleAddToCart = (product: ProductType) => {
                     <h2 className="text-xl font-bold mb-2 text-gray-800">{product.name}</h2>
                     <p className="text-gray-600 mb-4">{product.description}</p>
                     
-                    {/* 월간/연간 결제 선택 토글 - AI 제품만 표시 */}
                     {['perplexity', 'claude', 'chatgpt'].includes(product.id) && (
                       <div className="mb-4">
                         <div className="flex items-center justify-start gap-3 mb-2">
@@ -733,7 +792,7 @@ const handleAddToCart = (product: ProductType) => {
                     <div className="mb-4">
                       <h3 className="font-semibold text-gray-700 mb-2">플랜 선택</h3>
                       <div className="flex flex-wrap gap-2">
-                        {product.plans.map(plan => (
+                        {product.plans.map((plan: ProductPlan) => (
                           <button
                             key={plan.id}
                             onClick={() => handlePlanSelect(product.id, plan.id)}
@@ -745,18 +804,13 @@ const handleAddToCart = (product: ProductType) => {
                           >
                             {plan.name} - {
                               (() => {
-                                // 월간 결제 옵션이 있는 제품인지 확인
                                 const hasMonthlyOption = ['perplexity', 'claude', 'chatgpt'].includes(product.id);
                                 
-                                // 월별 결제인 경우
                                 if (hasMonthlyOption && getBillingCycle(product.id) === 'monthly' && 'monthlyPrice' in plan && typeof plan.monthlyPrice === 'number') {
                                   return `${plan.monthlyPrice.toLocaleString()}원/월`;
-                                }
-                                // 연간 결제인 경우
-                                else if (getBillingCycle(product.id) === 'yearly' && 'yearlyPrice' in plan && typeof plan.yearlyPrice === 'number') {
+                                } else if (getBillingCycle(product.id) === 'yearly' && 'yearlyPrice' in plan && typeof plan.yearlyPrice === 'number') {
                                   return `${plan.yearlyPrice.toLocaleString()}원/년`;
                                 }
-                                // 기본 표시
                                 return plan.priceDisplay;
                               })()
                             }
@@ -772,7 +826,6 @@ const handleAddToCart = (product: ProductType) => {
                           const selectedPlanId = selectedPlans[product.id] || product.plans[0].id;
                           const selectedPlan = product.plans.find(plan => plan.id === selectedPlanId);
                           
-                          // 플랜의 기능 목록 가져오기
                           let featuresToShow: string[] = [];
                           
                           if (selectedPlan && 'features' in selectedPlan && Array.isArray(selectedPlan.features)) {
@@ -780,7 +833,6 @@ const handleAddToCart = (product: ProductType) => {
                           }
                           
                           if (featuresToShow.length > 0) {
-                            // 선택된 플랜의 기능 목록이 있는 경우
                             return featuresToShow.map((feature: string, idx: number) => (
                               <li key={idx} className="text-sm text-gray-600 flex items-start">
                                 <svg className="w-4 h-4 text-green-500 mr-1 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -790,7 +842,6 @@ const handleAddToCart = (product: ProductType) => {
                               </li>
                             ));
                           } else {
-                            // 선택된 플랜의 기능 목록이 없는 경우 기본 기능 목록 표시
                             return product.features.map((feature: string, idx: number) => (
                             <li key={idx} className="text-sm text-gray-600 flex items-start">
                               <svg className="w-4 h-4 text-green-500 mr-1 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -824,7 +875,6 @@ const handleAddToCart = (product: ProductType) => {
                         </button>
                       </div>
                     </div>
-                    {/* 계산된 견적 가격 표시 */}
                     {(() => {
                       const selectedPlanId = selectedPlans[product.id] || product.plans[0].id;
                       const selectedPlan = product.plans.find(plan => plan.id === selectedPlanId);
@@ -832,7 +882,6 @@ const handleAddToCart = (product: ProductType) => {
                       
                       if (!selectedPlan) return null;
                       
-                      // 가격 계산
                       let price = selectedPlan.price;
                       const hasMonthlyOption = ['perplexity', 'claude', 'chatgpt'].includes(product.id);
                       const currentBillingCycle = getBillingCycle(product.id);
@@ -868,7 +917,6 @@ const handleAddToCart = (product: ProductType) => {
           </div>
         </div>
         
-        {/* 기타 제품 섹션 */}
         <h2 className="text-2xl font-bold mb-4 text-center">교육용 툴 및 서비스</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
           {products
@@ -897,7 +945,7 @@ const handleAddToCart = (product: ProductType) => {
                 <div className="mb-4">
                   <h3 className="font-semibold text-gray-700 mb-2">플랜 선택</h3>
                   <div className="flex flex-wrap gap-2">
-                    {product.plans.map(plan => (
+                    {product.plans.map((plan: ProductPlan) => (
                       <button
                         key={plan.id}
                         onClick={() => handlePlanSelect(product.id, plan.id)}
@@ -909,18 +957,13 @@ const handleAddToCart = (product: ProductType) => {
                       >
                         {plan.name} - {
                           (() => {
-                            // 월간 결제 옵션이 있는 제품인지 확인 (Perplexity, Claude, ChatGPT만 적용)
                             const hasMonthlyOption = ['perplexity', 'claude', 'chatgpt'].includes(product.id);
                             
-                            // 월별 결제인 경우 (월간 옵션이 있는 제품만)
                             if (hasMonthlyOption && getBillingCycle(product.id) === 'monthly' && 'monthlyPrice' in plan && typeof plan.monthlyPrice === 'number') {
                               return `${plan.monthlyPrice.toLocaleString()}원/월`;
-                            }
-                            // 연간 결제인 경우
-                            else if (getBillingCycle(product.id) === 'yearly' && 'yearlyPrice' in plan && typeof plan.yearlyPrice === 'number') {
+                            } else if (getBillingCycle(product.id) === 'yearly' && 'yearlyPrice' in plan && typeof plan.yearlyPrice === 'number') {
                               return `${plan.yearlyPrice.toLocaleString()}원/년`;
                             }
-                            // 기본 표시
                             return plan.priceDisplay;
                           })()
                         }
@@ -936,7 +979,6 @@ const handleAddToCart = (product: ProductType) => {
                       const selectedPlanId = selectedPlans[product.id] || product.plans[0].id;
                       const selectedPlan = product.plans.find(plan => plan.id === selectedPlanId);
                       
-                      // 플랜의 기능 목록 가져오기
                       let featuresToShow: string[] = [];
                       
                       if (selectedPlan && 'features' in selectedPlan && Array.isArray(selectedPlan.features)) {
@@ -944,7 +986,6 @@ const handleAddToCart = (product: ProductType) => {
                       }
                       
                       if (featuresToShow.length > 0) {
-                        // 선택된 플랜의 기능 목록이 있는 경우
                         return featuresToShow.map((feature: string, idx: number) => (
                           <li key={idx} className="text-sm text-gray-600 flex items-start">
                             <svg className="w-4 h-4 text-green-500 mr-1 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -954,7 +995,6 @@ const handleAddToCart = (product: ProductType) => {
                           </li>
                         ));
                       } else {
-                        // 선택된 플랜의 기능 목록이 없는 경우 기본 기능 목록 표시
                         return product.features.map((feature: string, idx: number) => (
                         <li key={idx} className="text-sm text-gray-600 flex items-start">
                           <svg className="w-4 h-4 text-green-500 mr-1 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1000,7 +1040,6 @@ const handleAddToCart = (product: ProductType) => {
                     </button>
                   </div>
                 </div>
-                {/* 계산된 견적 가격 표시 */}
                 {(() => {
                   const selectedPlanId = selectedPlans[product.id] || product.plans[0].id;
                   const selectedPlan = product.plans.find(plan => plan.id === selectedPlanId);
@@ -1010,47 +1049,90 @@ const handleAddToCart = (product: ProductType) => {
                   
                   if (!selectedPlan) return null;
                   
-                  // 가격 계산
                   let price = selectedPlan.price;
                   let totalPrice = price;
+                  let unitPrice = price;
                   
                   if ('yearlyPrice' in selectedPlan && typeof selectedPlan.yearlyPrice === 'number') {
                     price = selectedPlan.yearlyPrice;
+                    unitPrice = price;
                   }
                   
-                  // Padlet 강의실 플랜의 경우 특별 가격 계산 로직
                   if (product.id === 'padlet' && selectedPlanId === 'classroom') {
-                    // 기본 가격 300,000원 (교사 2명, 학생 200명)
-                    // 추가 교사 1명당 150,000원 (학생 100명 포함)
-                    // 최대 교사 9명까지 추가 가능 (총 11명)
-                    const baseQuantity = 2; // 기본 교사 수
-                    // 수량은 최대 9까지만 가능
+                    const baseQuantity = 2;
                     const limitedQuantity = Math.min(9, quantity);
-                    const additionalTeachers = Math.max(0, limitedQuantity - baseQuantity); // 추가 교사 수 (최대 7명)
+                    const additionalTeachers = Math.max(0, limitedQuantity - baseQuantity);
                     totalPrice = price + (additionalTeachers * 150000);
+                  } else if (product.id === 'redmenta') {
+                    const discountedPrice = getRedmentaDiscountedPrice(selectedPlanId, quantity);
+                    
+                    if (discountedPrice === null) {
+                      return (
+                        <div className="mb-3">
+                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                            <p className="font-semibold text-blue-700 text-center">20개 이상: 별도 협의</p>
+                            <p className="text-sm text-blue-600 mt-1 text-center">대량 구매 할인 적용</p>
+                          </div>
+                        </div>
+                      );
+                    } else {
+                      unitPrice = discountedPrice;
+                      totalPrice = unitPrice * quantity;
+                      
+                      const originalPrice = selectedPlanId === 'standard' ? 190000 : 290000;
+                      const isDiscounted = unitPrice < originalPrice;
+                      
+                      return (
+                        <div className="mb-3">
+                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                            <p className="font-semibold text-blue-700 text-center">총 가격: {totalPrice.toLocaleString()}원</p>
+                            <div className="flex justify-center items-center gap-2 mt-1">
+                              <p className="text-sm text-blue-600">
+                                계정당 {unitPrice.toLocaleString()}원
+                              </p>
+                              {isDiscounted && (
+                                <span className="bg-orange-100 text-orange-700 text-xs px-1.5 py-0.5 rounded">
+                                  볼륨 할인
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-gray-500 text-center mt-1">
+                              {quantity}개 × {unitPrice.toLocaleString()}원
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    }
                   } else {
                     totalPrice = price * quantity;
                   }
                   
-                  // Padlet 강의실 플랜의 경우 교사 수와 학생 수 표시
                   if (product.id === 'padlet' && selectedPlanId === 'classroom') {
-                    const baseQuantity = 2; // 기본 교사 수
-                    // 수량은 최대 9까지만 가능
+                    const baseQuantity = 2;
                     const limitedQuantity = Math.min(9, quantity);
-                    const additionalTeachers = Math.max(0, limitedQuantity - baseQuantity); // 추가 교사 수 (최대 7명)
+                    const additionalTeachers = Math.max(0, limitedQuantity - baseQuantity);
                     const totalTeachers = baseQuantity + additionalTeachers;
-                    const totalStudents = 200 + (additionalTeachers * 100); // 기본 200명 + 추가 교사당 100명
+                    const totalStudents = 200 + (additionalTeachers * 100);
                     
                     return (
-                      <div className="mb-3 text-center">
-                        <span className="font-semibold text-blue-700">계산된 견적 가격: {totalPrice.toLocaleString()}원</span>
-                        <p className="text-sm text-gray-600 mt-1">교사 {totalTeachers}명, 학생 {totalStudents}명</p>
+                      <div className="mb-3">
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                          <p className="font-semibold text-blue-700 text-center">총 가격: {totalPrice.toLocaleString()}원</p>
+                          <p className="text-sm text-blue-600 text-center mt-1">교사 {totalTeachers}명, 학생 {totalStudents}명</p>
+                        </div>
                       </div>
                     );
                   } else {
                     return (
-                      <div className="mb-3 text-center">
-                        <span className="font-semibold text-blue-700">계산된 견적 가격: {totalPrice.toLocaleString()}원</span>
+                      <div className="mb-3">
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                          <p className="font-semibold text-blue-700 text-center">총 가격: {totalPrice.toLocaleString()}원</p>
+                          {quantity > 1 && (
+                            <p className="text-xs text-gray-500 text-center mt-1">
+                              {quantity}개 × {unitPrice.toLocaleString()}원
+                            </p>
+                          )}
+                        </div>
                       </div>
                     );
                   }
@@ -1084,48 +1166,11 @@ const handleAddToCart = (product: ProductType) => {
           >
             맞춤 견적 문의하기
           </button>
-
-          {/* Airtable 팝업 모달 */}
-          {isQuoteModalOpen && (
-            <div
-              className="fixed inset-0 z-[1000] flex items-center justify-center"
-              style={{ background: 'rgba(0,0,0,0.4)' }}
-              onClick={() => setIsQuoteModalOpen(false)}
-            >
-              <div
-                className="bg-white rounded-2xl shadow-2xl max-w-lg w-full relative overflow-hidden"
-                style={{ minHeight: 600, maxWidth: 480 }}
-                onClick={e => e.stopPropagation()}
-              >
-                <button
-                  className="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-2xl font-bold z-10"
-                  onClick={() => setIsQuoteModalOpen(false)}
-                  aria-label="닫기"
-                  type="button"
-                >
-                  ×
-                </button>
-                <iframe
-                  className="airtable-embed"
-                  src="https://airtable.com/embed/appnhPWwfx1nd35tg/pageG73CLVY72AUXr/form"
-                  frameBorder="0"
-                  onWheel={undefined}
-                  width="100%"
-                  height="533"
-                  style={{ background: 'transparent', border: '1px solid #ccc' }}
-                  title="Airtable 견적 문의 폼"
-                  allow="fullscreen"
-                />
-              </div>
-            </div>
-          )}
         </div>
       </div>
       
-      {/* 장바구니 버튼 */}
       <CartButton onClick={() => setIsCartOpen(true)} />
       
-      {/* 장바구니 드로어 */}
       <CartDrawer open={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </>
   );
