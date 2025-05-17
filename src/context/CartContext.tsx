@@ -8,6 +8,8 @@ export interface CartProduct {
   image_url: string;
   plan?: string; // 선택된 플랜명
   quantity: number;
+  schoolType?: string; // 학교 유형 (A, B, C, D)
+  studentCount?: number; // 학생 수
 }
 
 interface CartState {
@@ -28,7 +30,7 @@ const CartContext = createContext<{
 function cartReducer(state: CartState, action: CartAction): CartState {
   switch (action.type) {
     case 'ADD_ITEM': {
-      console.log('Adding item to cart:', action.product);
+      // 디버깅 코드 제거
       // 동일 상품+플랜이면 수량 증가
       const idx = state.items.findIndex(
         (item) => item.id === action.product.id && item.plan === action.product.plan
@@ -36,11 +38,11 @@ function cartReducer(state: CartState, action: CartAction): CartState {
       if (idx !== -1) {
         const items = [...state.items];
         items[idx].quantity += action.product.quantity;
-        console.log('Updated cart items:', items);
+        // 디버깅 코드 제거
         return { items };
       }
       const newItems = [...state.items, action.product];
-      console.log('New cart items:', newItems);
+      // 디버깅 코드 제거
       return { items: newItems };
     }
     case 'REMOVE_ITEM': {
@@ -94,7 +96,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   React.useEffect(() => {
     try {
       localStorage.setItem('cart', JSON.stringify(cart));
-      console.log('Cart saved to localStorage:', cart);
+      // 디버깅 코드 제거
     } catch (error) {
       console.error('Failed to save cart to localStorage:', error);
     }

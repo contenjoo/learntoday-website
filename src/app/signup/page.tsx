@@ -8,7 +8,9 @@ export default function SignupPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
     email: "",
+    name: "",
     password: "",
+    passwordConfirm: "",
     phoneNumber: "",
     schoolName: "",
   });
@@ -28,8 +30,15 @@ export default function SignupPage() {
     setSuccess(false);
     
     // 입력값 검증
-    if (!formData.email || !formData.password || !formData.phoneNumber || !formData.schoolName) {
+    if (!formData.email || !formData.name || !formData.password || !formData.passwordConfirm || !formData.phoneNumber || !formData.schoolName) {
       setError("모든 필드를 입력해주세요.");
+      setLoading(false);
+      return;
+    }
+    
+    // 비밀번호 일치 여부 확인
+    if (formData.password !== formData.passwordConfirm) {
+      setError("비밀번호가 일치하지 않습니다.");
       setLoading(false);
       return;
     }
@@ -57,6 +66,7 @@ export default function SignupPage() {
         password: formData.password,
         options: {
           data: {
+            name: formData.name,
             phone_number: formData.phoneNumber,
             school_name: formData.schoolName,
           }
@@ -100,6 +110,19 @@ export default function SignupPage() {
           />
         </div>
         <div className="mb-4">
+          <label htmlFor="name" className="mb-2 block text-sm font-medium text-gray-700">이름</label>
+          <input
+            id="name"
+            name="name"
+            type="text"
+            required
+            className="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
+            value={formData.name}
+            onChange={handleChange}
+            placeholder="홍길동"
+          />
+        </div>
+        <div className="mb-4">
           <label htmlFor="password" className="mb-2 block text-sm font-medium text-gray-700">비밀번호</label>
           <input
             id="password"
@@ -111,6 +134,22 @@ export default function SignupPage() {
             onChange={handleChange}
             placeholder="비밀번호 (6자 이상)"
           />
+        </div>
+        <div className="mb-4">
+          <label htmlFor="passwordConfirm" className="mb-2 block text-sm font-medium text-gray-700">비밀번호 확인</label>
+          <input
+            id="passwordConfirm"
+            name="passwordConfirm"
+            type="password"
+            required
+            className="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
+            value={formData.passwordConfirm}
+            onChange={handleChange}
+            placeholder="비밀번호 확인"
+          />
+          {formData.password && formData.passwordConfirm && formData.password !== formData.passwordConfirm && (
+            <p className="mt-1 text-xs text-red-600">비밀번호가 일치하지 않습니다.</p>
+          )}
         </div>
         <div className="mb-4">
           <label htmlFor="phoneNumber" className="mb-2 block text-sm font-medium text-gray-700">전화번호</label>
