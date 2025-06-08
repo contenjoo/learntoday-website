@@ -164,11 +164,13 @@ export default function MizouPriceCalculator({
         onClick={handleAddToCart}
         className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
       >
-        <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-          <path d="M6 6h15l-1.68 8.39A2 2 0 0 1 17.36 16H8.64a2 2 0 0 1-1.96-1.61L4 4H2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"></path>
-          <circle cx="9" cy="21" r="1" fill="currentColor"></circle>
-          <circle cx="19" cy="21" r="1" fill="currentColor"></circle>
-        </svg>
+        <span className="cart-icon flex items-center justify-center">
+          <i className="inline-block w-5 h-5 relative">
+            <span className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
+              🛒
+            </span>
+          </i>
+        </span>
         장바구니에 추가
       </button>
     </div>

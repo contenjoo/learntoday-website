@@ -1,197 +1,44 @@
 "use client";
 
-import { useState } from "react";
-import { supabase } from "@/utils/supabase";
+import Link from "next/link";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function SignupPage() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    email: "",
-    name: "",
-    password: "",
-    passwordConfirm: "",
-    phoneNumber: "",
-    schoolName: "",
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
-  
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
 
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    setSuccess(false);
-    
-    // 입력값 검증
-    if (!formData.email || !formData.name || !formData.password || !formData.passwordConfirm || !formData.phoneNumber || !formData.schoolName) {
-      setError("모든 필드를 입력해주세요.");
-      setLoading(false);
-      return;
-    }
-    
-    // 비밀번호 일치 여부 확인
-    if (formData.password !== formData.passwordConfirm) {
-      setError("비밀번호가 일치하지 않습니다.");
-      setLoading(false);
-      return;
-    }
-    
-    // 이메일 형식 검증
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      setError("올바른 이메일 형식이 아닙니다.");
-      setLoading(false);
-      return;
-    }
-    
-    // 전화번호 형식 검증 (숫자, -, 공백만 허용)
-    const phoneRegex = /^[0-9\-\s]+$/;
-    if (!phoneRegex.test(formData.phoneNumber)) {
-      setError("전화번호는 숫자, - 만 입력 가능합니다.");
-      setLoading(false);
-      return;
-    }
-    
-    try {
-      // 1. Supabase Auth로 사용자 계정 생성
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          data: {
-            name: formData.name,
-            phone_number: formData.phoneNumber,
-            school_name: formData.schoolName,
-          }
-        }
-      });
-      
-      if (authError) throw authError;
-      
-      // 성공 처리
-      setSuccess(true);
-      // 5초 후 홈페이지로 이동
-      setTimeout(() => {
-        router.push('/');
-      }, 5000);
-    } catch (err: any) {
-      console.error('회원가입 오류:', err);
-      setError(err.message || '회원가입 중 오류가 발생했습니다.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    // 3초 후 자동으로 메인페이지로 리디렉션
+    const timer = setTimeout(() => {
+      router.push('/');
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [router]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-      <form
-        onSubmit={handleSignup}
-        className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg"
-      >
-        <h2 className="mb-6 text-2xl font-bold text-gray-900">회원가입</h2>
-        <div className="mb-4">
-          <label htmlFor="email" className="mb-2 block text-sm font-medium text-gray-700">이메일</label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            required
-            className="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="your@email.com"
-          />
-        </div>
-        <div className="mb-4">
-          <label htmlFor="name" className="mb-2 block text-sm font-medium text-gray-700">이름</label>
-          <input
-            id="name"
-            name="name"
-            type="text"
-            required
-            className="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
-            value={formData.name}
-            onChange={handleChange}
-            placeholder="홍길동"
-          />
-        </div>
-        <div className="mb-4">
-          <label htmlFor="password" className="mb-2 block text-sm font-medium text-gray-700">비밀번호</label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            required
-            className="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
-            value={formData.password}
-            onChange={handleChange}
-            placeholder="비밀번호 (6자 이상)"
-          />
-        </div>
-        <div className="mb-4">
-          <label htmlFor="passwordConfirm" className="mb-2 block text-sm font-medium text-gray-700">비밀번호 확인</label>
-          <input
-            id="passwordConfirm"
-            name="passwordConfirm"
-            type="password"
-            required
-            className="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
-            value={formData.passwordConfirm}
-            onChange={handleChange}
-            placeholder="비밀번호 확인"
-          />
-          {formData.password && formData.passwordConfirm && formData.password !== formData.passwordConfirm && (
-            <p className="mt-1 text-xs text-red-600">비밀번호가 일치하지 않습니다.</p>
-          )}
-        </div>
-        <div className="mb-4">
-          <label htmlFor="phoneNumber" className="mb-2 block text-sm font-medium text-gray-700">전화번호</label>
-          <input
-            id="phoneNumber"
-            name="phoneNumber"
-            type="tel"
-            required
-            className="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
-            value={formData.phoneNumber}
-            onChange={handleChange}
-            placeholder="010-0000-0000"
-          />
-        </div>
+      <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg text-center">
         <div className="mb-6">
-          <label htmlFor="schoolName" className="mb-2 block text-sm font-medium text-gray-700">소속 (학교/기관명)</label>
-          <input
-            id="schoolName"
-            name="schoolName"
-            type="text"
-            required
-            className="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
-            value={formData.schoolName}
-            onChange={handleChange}
-            placeholder="소속 학교 또는 기관명"
-          />
+          <svg className="mx-auto h-16 w-16 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+          </svg>
         </div>
-        {error && <div className="mb-4 text-sm text-red-600">{error}</div>}
-        {success && (
-          <div className="mb-4 p-3 rounded-md text-sm text-green-600 bg-green-50 border border-green-200">
-            회원가입이 완료되었습니다! 이메일을 확인해주세요.<br/>
-            잠시 후 홈페이지로 이동합니다.
-          </div>
-        )}
-        <button
-          type="submit"
-          className="w-full rounded bg-blue-600 py-2 font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
-          disabled={loading}
+        
+        <h2 className="mb-4 text-2xl font-bold text-gray-900">서비스 일시 중단</h2>
+        
+        <p className="mb-6 text-gray-600">
+          회원가입 서비스가 일시적으로 중단되었습니다.<br />
+          3초 후 자동으로 메인페이지로 이동합니다.
+        </p>
+        
+        <Link
+          href="/"
+          className="inline-block rounded bg-blue-600 px-6 py-2 font-semibold text-white hover:bg-blue-700 transition-colors"
         >
-          {loading ? "가입 중..." : "회원가입"}
-        </button>
-      </form>
+          메인페이지로 돌아가기
+        </Link>
+      </div>
     </div>
   );
 }

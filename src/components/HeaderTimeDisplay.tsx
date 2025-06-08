@@ -5,38 +5,10 @@ export default function HeaderTimeDisplay() {
   const [time, setTime] = useState<string>('');
   const [date, setDate] = useState<string>('');
   const [greeting, setGreeting] = useState<string>('');
-  const [quote, setQuote] = useState<string>('');
-  const [author, setAuthor] = useState<string>('윤빛');
   const [mounted, setMounted] = useState(false);
-  
-  // 명언 목록 가져오기
-  const fetchQuotes = async () => {
-    try {
-      const quotes = [
-        '돈은 마실수록 목마른 바닷물이다.',
-        '지식은 힘이다, 그러나 실천이 없는 지식은 무용지물이다.',
-        '배움에는 끝이 없다, 그것이 인생의 아름다움이다.',
-        '오늘 할 수 있는 일을 내일로 미루지 마라.',
-        '실패는 성공의 어머니이다.',
-        '인생은 선택의 연속이다.',
-        '시간은 가장 공평한 자원이다.',
-        '꿈을 향해 한 걸음씩 나아가라.',
-        '겸손은 지혜의 시작이다.',
-        '행복은 나눌수록 커진다.'
-      ];
-      
-      // 랜덤 명언 선택
-      const randomIndex = Math.floor(Math.random() * quotes.length);
-      setQuote(quotes[randomIndex]);
-    } catch (error) {
-      console.error('명언을 가져오는 중 오류 발생:', error);
-      setQuote('배움에는 끝이 없다.');
-    }
-  };
 
   useEffect(() => {
     setMounted(true);
-    fetchQuotes();
     
     const updateTime = () => {
       const now = new Date();
@@ -82,12 +54,8 @@ export default function HeaderTimeDisplay() {
     // 1초마다 업데이트
     const timeInterval = setInterval(updateTime, 1000);
     
-    // 30초마다 명언 업데이트
-    const quoteInterval = setInterval(fetchQuotes, 30000);
-    
     return () => {
       clearInterval(timeInterval);
-      clearInterval(quoteInterval);
     };
   }, []);
   
@@ -101,11 +69,6 @@ export default function HeaderTimeDisplay() {
         <div className="text-lg font-bold text-blue-700">{time}</div>
       </div>
       <div className="text-xs text-gray-500">{date}</div>
-      <div className="mt-1 text-xs text-gray-600 italic flex items-center">
-        <span className="text-blue-400 mr-1">"</span>
-        <span>{quote}</span>
-        <span className="text-blue-400 ml-1">"</span>
-      </div>
     </div>
   );
 }

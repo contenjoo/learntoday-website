@@ -3,6 +3,14 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  
+  /* 교육기관용 색상 */
+  --edu-primary: #4B7BEC;
+  --edu-secondary: #26DE81;
+  
+  /* 기업용 색상 */
+  --ent-primary: #2C3E50;
+  --ent-secondary: #3498DB;
 }
 
 @theme inline {
@@ -16,4 +24,354 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* 텍스트 그림자 유틸리티 클래스 */
+.text-shadow-lg {
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.text-shadow-md {
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+/* 장바구니 아이콘 스타일 */
+.cart-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+/* Next.js 로딩 아이콘 숨기기 - 더 강력한 규칙 */
+[data-next-mark-loading],
+[data-next-mark-loading="true"],
+[data-next-mark-loading="false"] {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+  position: absolute !important;
+  pointer-events: none !important;
+  clip: rect(0, 0, 0, 0) !important;
+  overflow: hidden !important;
+}
+
+/* Next.js 로딩 아이콘 관련 SVG 요소 숨기기 */
+svg[data-next-mark-loading],
+svg[data-next-mark-loading] *,
+svg[width="40"][height="40"],
+svg[viewBox="0 0 40 40"],
+svg[class*="next-mark"],
+[class*="next-mark"],
+svg[width="40"],
+svg[height="40"] {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+  position: absolute !important;
+  pointer-events: none !important;
+  clip: rect(0, 0, 0, 0) !important;
+  overflow: hidden !important;
+}
+
+/* Next.js 로딩 마크와 관련된 모든 요소 숨기기 */
+[data-next-mark-loading] *,
+[data-next-mark-loading="true"] *,
+[data-next-mark-loading="false"] * {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* 특정 패턴의 SVG 요소들 숨기기 */
+svg:has(path[class*="paused"]),
+svg:has(linearGradient[id*="next_logo"]),
+svg:has(mask[id*="next_logo"]) {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* 듀얼 포털 스타일 */
+.landing-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+}
+
+.portal-container {
+  display: flex;
+  flex-grow: 1;
+}
+
+.portal {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.portal:hover {
+  transform: scale(1.01);
+  filter: brightness(1.05);
+  z-index: 1;
+}
+
+.landing-header {
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.2));
+  backdrop-filter: blur(10px);
+}
+
+.portal::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.portal:hover::after {
+  opacity: 1;
+}
+
+.portal-content {
+  position: relative;
+  z-index: 2;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+
+
+.education-portal {
+  background-image: linear-gradient(rgba(75, 123, 236, 0.8), rgba(38, 222, 129, 0.8));
+}
+
+.enterprise-portal {
+  background-image: linear-gradient(rgba(44, 62, 80, 0.8), rgba(52, 152, 219, 0.8));
+}
+
+.cta-button {
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.cta-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+}
+
+/* 백드롭 블러 효과 */
+.backdrop-blur-sm {
+  backdrop-filter: blur(4px);
+}
+
+@media (max-width: 768px) {
+  .portal-container {
+    flex-direction: column;
+  }
+  
+  .enterprise-portal {
+    order: 1;
+  }
+  
+  .education-portal {
+    order: 2;
+  }
+  
+  .portal {
+    min-height: 50vh;
+  }
+  
+  .landing-header {
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.4));
+  }
+  
+  /* 모바일 텍스트 크기 최적화 */
+  .portal-content h1 {
+    font-size: 2rem !important;
+    line-height: 1.2 !important;
+  }
+  
+  .portal-content h2 {
+    font-size: 1.125rem !important;
+    line-height: 1.4 !important;
+  }
+  
+  /* 모바일 패딩 최적화 */
+  .portal {
+    padding: 2rem 1rem !important;
+  }
+  
+  /* 모바일 버튼 크기 최적화 */
+  .cta-button {
+    padding: 1rem 2rem !important;
+    font-size: 1rem !important;
+    display: block !important;
+    text-align: center !important;
+    width: 100% !important;
+    max-width: 300px !important;
+    margin: 0 auto !important;
+  }
+  
+  /* 모바일 터치 친화적 크기 */
+  .value-points li {
+    padding: 1rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+  
+  /* 모바일 호버 효과 제거 */
+  .portal:hover {
+    transform: none !important;
+    filter: none !important;
+  }
+  
+  .portal:hover::after {
+    opacity: 0 !important;
+  }
+}
+
+/* 태블릿 최적화 */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .portal-content h1 {
+    font-size: 2.5rem !important;
+  }
+  
+  .portal-content h2 {
+    font-size: 1.25rem !important;
+  }
+  
+  .portal {
+    padding: 3rem 2rem !important;
+  }
+}
+
+/* 터치 디바이스 최적화 */
+@media (hover: none) and (pointer: coarse) {
+  .portal:hover {
+    transform: none !important;
+    filter: none !important;
+  }
+  
+  .cta-button:hover {
+    transform: none !important;
+  }
+  
+  .cta-button:hover::before {
+    left: -100% !important;
+  }
+}
+
+/* 접근성 개선 */
+@media (prefers-reduced-motion: reduce) {
+  .portal,
+  .cta-button,
+  .portal-content {
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  .portal:hover {
+    transform: none !important;
+  }
+}
+
+/* 고해상도 디스플레이 최적화 */
+@media (-webkit-min-device-pixel-ratio: 2) {
+  .text-shadow-lg {
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5), 0.5px 0.5px 1px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* 모바일 스크롤 최적화 */
+body {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* 모바일 선택 방지 */
+.portal-content {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.portal-content h1,
+.portal-content h2,
+.portal-content .value-points {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+/* 터치 친화적 버튼 크기 최소화 */
+button, a, input, textarea, select {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* 모바일 터치 피드백 */
+@media (hover: none) and (pointer: coarse) {
+  .cta-button:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+  
+  button:active,
+  a:active {
+    opacity: 0.8;
+  }
+}
+
+/* 안전 영역 지원 (iPhone X 이상) */
+@supports (padding: max(0px)) {
+  body {
+    padding-left: max(12px, env(safe-area-inset-left));
+    padding-right: max(12px, env(safe-area-inset-right));
+  }
+  
+  .landing-header {
+    padding-top: max(1.5rem, env(safe-area-inset-top));
+  }
+}
+
+/* 모바일 스크롤 개선 */
+.portal-container {
+  scroll-snap-type: y mandatory;
+}
+
+.portal {
+  scroll-snap-align: start;
+}
+
+/* 모바일 성능 최적화 */
+.portal-content {
+  will-change: transform;
+}
+
+/* 고밀도 디스플레이 최적화 */
+@media only screen and (-webkit-min-device-pixel-ratio: 2) {
+  .portal-content h1,
+  .portal-content h2 {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 }

@@ -1,0 +1,73 @@
+/* Next.js 로딩 아이콘 숨기기 - CSS만 사용 */
+[data-next-mark-loading],
+[data-next-mark-loading="true"],
+[data-next-mark-loading="false"],
+svg[data-next-mark-loading],
+svg[data-next-mark-loading] *,
+svg[width="40"][height="40"],
+svg[viewBox="0 0 40 40"],
+svg[class*="next-mark"],
+[class*="next-mark"],
+svg[width="40"],
+svg[height="40"] {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+  position: absolute !important;
+  pointer-events: none !important;
+  clip: rect(0, 0, 0, 0) !important;
+  overflow: hidden !important;
+}
+
+/* 브라우저 확장 프로그램 스타일 초기화 */
+[bis_skin_checked],
+[bis_size],
+[bis_id] {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Next.js 개발 모드 인디케이터 숨기기 */
+#__next-build-watcher,
+[data-nextjs-scroll-focus-boundary] {
+  display: none !important;
+}
+
+/* SVG 내부 path 요소 */
+svg path.paused,
+svg g[transform*="translate(8.5, 13)"],
+svg defs linearGradient[id*="next_logo"],
+svg defs mask[id*="next_logo"] {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* 특정 SVG 패턴 */
+svg[width="40"][height="40"][viewBox="0 0 40 40"][fill="none"][data-next-mark-loading],
+svg[width="40"][height="40"][viewBox="0 0 40 40"][fill="none"] {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* 추가 선택자 - 더 구체적인 패턴 */
+svg g[transform="translate(8.5, 13)"] path[d*="M13.3 15.2 L2.34 1 V12.6"],
+svg g[transform="translate(8.5, 13)"] path[d*="M11.825 1.5 V13.1"] {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* 부모 요소 선택자 */
+:has(> svg[width="40"][height="40"]),
+:has(> svg[viewBox="0 0 40 40"]),
+:has(> [data-next-mark-loading]) {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}

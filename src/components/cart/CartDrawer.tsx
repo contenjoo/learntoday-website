@@ -331,9 +331,7 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
           <div className="p-6 bg-green-50 rounded-lg shadow-md border-t mt-4">
             <div className="text-center">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
+                <span className="text-green-600 text-2xl">✓</span>
               </div>
               <h3 className="text-2xl font-bold text-green-800 mb-2">주문이 성공적으로 완료되었습니다!</h3>
               <p className="text-green-700 mb-6">주문해주셔서 감사합니다. 주문 정보를 확인해 보세요.</p>

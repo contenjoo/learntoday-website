@@ -2,8 +2,10 @@
 
 import React from 'react';
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
+import { useDemoContext } from '@/context/DemoContext';
 import CartButton from '@/components/cart/CartButton';
 import CartDrawer from '@/components/cart/CartDrawer';
 import MiniCartToast from '@/components/cart/MiniCartToast';
@@ -449,10 +451,10 @@ const products = [
     image: '/images/snorkl.png',
     plans: [
       { id: 'teacher', name: 'Teacher', price: 250000, priceDisplay: '250,000원/년' },
-      {
-        id: 'teacher-team',
-        name: 'Teacher Team (최소 5명)',
-        price: 220000,
+      { 
+        id: 'teacher-team', 
+        name: 'Teacher Team (최소 5명)', 
+        price: 220000, 
         priceDisplay: '220,000원/인당 (최소 5명)',
         minQuantity: 5,
         features: [
@@ -464,10 +466,10 @@ const products = [
         ]
       },
       { id: 'school', name: 'School', price: 1870000, priceDisplay: '1,870,000원/년' },
-      {
-        id: 'district',
-        name: 'District',
-        price: 3630000,
+      { 
+        id: 'district', 
+        name: 'District', 
+        price: 3630000, 
         priceDisplay: '3,630,000원 (동일지역 5개학교 공동구매시 학교당 726,000원)',
         features: [
           '디지털 화이트보드',
@@ -686,21 +688,16 @@ const products = [
 ];
 
 export default function ProductsPage() {
+  const searchParams = useSearchParams();
+  const isEnterprise = searchParams.get('type') === 'enterprise';
+  const { openDemoScheduler } = useDemoContext();
   const { dispatch } = useCart();
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMiniCartVisible, setIsMiniCartVisible] = useState(false);
   const [lastAddedItem, setLastAddedItem] = useState<any>(null);
   const [selectedPlans, setSelectedPlans] = useState<Record<string, string>>({});
   const [quantities, setQuantities] = useState<Record<string, number>>({});
-  const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
   const [billingCycles, setBillingCycles] = useState<{[key: string]: 'monthly' | 'yearly'}>({});
-  const [quoteInfo, setQuoteInfo] = useState({
-    name: '',
-    email: '',
-    school: '',
-    phone: '',
-    message: '',
-  });
   const [mounted, setMounted] = useState(false);
   const [studentCounts, setStudentCounts] = useState<Record<string, number>>({mizou: 100});
   const [showStudentInputs, setShowStudentInputs] = useState<Record<string, boolean>>({});
@@ -711,14 +708,7 @@ export default function ProductsPage() {
     setMounted(true);
   }, []);
 
-  React.useEffect(() => {
-    if (isQuoteModalOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => { document.body.style.overflow = ''; };
-  }, [isQuoteModalOpen]);
+
 
   const toggleBillingCycle = (productId: string) => {
     setBillingCycles(prev => ({
@@ -736,14 +726,14 @@ export default function ProductsPage() {
       ...prev,
       [productId]: planId
     }));
-
+    
     // 최소 수량이 필요한 플랜 처리
     const product = products.find(p => p.id === productId);
     if (!product) return;
-
+    
     const selectedPlan = product.plans.find(p => p.id === planId);
     if (!selectedPlan) return;
-
+    
     // 학생 수 입력 필드 표시 여부 결정
     const needsStudentCount = (productId === 'mizou' && planId === 'school');
     setShowStudentInputs(prev => ({
@@ -763,7 +753,7 @@ export default function ProductsPage() {
     }
     // 최소 수량 확인
     let minQuantity = 1;
-
+    
     // Padlet 학교 플랜인 경우 최소 10개
     if (productId === 'padlet' && planId === 'school') {
       minQuantity = 10;
@@ -774,7 +764,7 @@ export default function ProductsPage() {
     } else if ('minQuantity' in selectedPlan && typeof selectedPlan.minQuantity === 'number') {
       minQuantity = selectedPlan.minQuantity;
     }
-
+    
     // 최소 수량 설정
     setQuantities(prev => {
       const currentQty = prev[productId] || 1;
@@ -790,10 +780,10 @@ export default function ProductsPage() {
     setQuantities(prev => {
       const currentQty = prev[productId] || 1;
       const selectedPlanId = selectedPlans[productId];
-
+      
       // 최소 수량 설정
       let minQty = 1;
-
+      
       // 특정 플랜에 대한 최소 수량 설정
       if (productId === 'padlet' && selectedPlanId === 'school') {
         minQty = 10;
@@ -810,7 +800,7 @@ export default function ProductsPage() {
           }
         }
       }
-
+      
       // 현재 수량이 최소 수량보다 작으면 최소 수량으로 설정
       if (currentQty < minQty) {
         return {
@@ -829,7 +819,7 @@ export default function ProductsPage() {
       };
     });
   };
-  
+
   // 수량 직접 입력 핸들러 - 통합된 handleQuantityChange 함수 사용
   const handleQuantityInput = (productId: string, value: number) => {
     handleQuantityChange(productId, undefined, value);
@@ -879,34 +869,34 @@ export default function ProductsPage() {
     }
     
     return basePrice;
-  };
+};
 
   const handleAddToCart = (product: Product) => {
     const selectedPlanId = selectedPlans[product.id] || product.plans[0].id;
     const selectedPlan = product.plans.find((plan: ProductPlan) => plan.id === selectedPlanId);
     const quantity = quantities[product.id] || 1;
-
+    
     if (!selectedPlan) return;
     
     // 선택된 결제 주기에 따라 가격 설정
     let price = selectedPlan.price;
-
+    
     // Mizou 학교 플랜인 경우 계산된 가격 사용
     if (product.id === 'mizou' && selectedPlanId === 'school' && customPrices[product.id]) {
       price = customPrices[product.id];
     }
     // 월간 결제 옵션이 있는 제품인지 확인 (Perplexity, Claude, ChatGPT만 적용)
     else if (['perplexity', 'claude', 'chatgpt'].includes(product.id)) {
-      const currentBillingCycle = getBillingCycle(product.id);
-      
+    const currentBillingCycle = getBillingCycle(product.id);
+    
       // 월별 결제인 경우 monthlyPrice 사용
       if (currentBillingCycle === 'monthly' && 'monthlyPrice' in selectedPlan && typeof selectedPlan.monthlyPrice === 'number') {
-        price = selectedPlan.monthlyPrice;
-      }
-      // 연간 결제인 경우 yearlyPrice 사용
-      else if (currentBillingCycle === 'yearly' && 'yearlyPrice' in selectedPlan && typeof selectedPlan.yearlyPrice === 'number') {
-        price = selectedPlan.yearlyPrice;
-      }
+      price = selectedPlan.monthlyPrice;
+    } 
+    // 연간 결제인 경우 yearlyPrice 사용
+    else if (currentBillingCycle === 'yearly' && 'yearlyPrice' in selectedPlan && typeof selectedPlan.yearlyPrice === 'number') {
+      price = selectedPlan.yearlyPrice;
+    }
     }
     // Redmenta AI 볼륨 할인 적용
     else if (product.id === 'redmenta') {
@@ -956,6 +946,50 @@ export default function ProductsPage() {
     </div>;
   }
 
+  // 엔터프라이즈 타입인 경우 별도 렌더링
+  if (isEnterprise) {
+    return (
+      <div className="font-[family-name:var(--font-geist-sans)]">
+        <div className="container mx-auto px-4 py-8 pb-24">
+          <div className="mb-8 text-center">
+            <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              오늘배움 엔터프라이즈 솔루션
+            </h1>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              기업 맞춤형 AI 교육 및 업무 혁신 솔루션을 준비하고 있습니다.
+            </p>
+          </div>
+          
+          <div className="max-w-2xl mx-auto text-center py-16">
+                         <div className="mb-8">
+               <div className="mx-auto h-24 w-24 bg-blue-100 rounded-full flex items-center justify-center">
+                 <span className="text-4xl">🏢</span>
+               </div>
+             </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              엔터프라이즈 전용 솔루션 준비 중
+            </h2>
+            <p className="text-gray-600 mb-8 leading-relaxed">
+              기업의 특별한 요구사항에 맞춘 맞춤형 AI 교육 솔루션과 업무 혁신 도구를 개발하고 있습니다. <br />
+              전문 컨설턴트와의 상담을 통해 귀하의 비즈니스에 최적화된 솔루션을 제안해드립니다.
+            </p>
+            <div className="space-y-4">
+              <button
+                onClick={openDemoScheduler}
+                className="w-full sm:w-auto px-8 py-4 bg-blue-600 text-white font-bold rounded-2xl shadow-lg hover:bg-blue-700 transition-colors"
+              >
+                맞춤 솔루션 상담받기
+              </button>
+              <div className="text-sm text-gray-500">
+                전문가와의 1:1 상담으로 최적의 솔루션을 찾아보세요
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <MiniCartToast 
@@ -964,51 +998,18 @@ export default function ProductsPage() {
         onViewCart={() => setIsCartOpen(true)}
         newItemAdded={lastAddedItem}
       />
-      {isQuoteModalOpen && (
-        <div
-          className="fixed inset-0 z-[1000] flex items-center justify-center"
-          style={{ background: 'rgba(0,0,0,0.4)' }}
-          onClick={() => setIsQuoteModalOpen(false)}
-        >
-          <div
-            className="bg-white rounded-2xl shadow-2xl max-w-lg w-full relative overflow-hidden"
-            style={{ minHeight: 600, maxWidth: 480 }}
-            onClick={e => e.stopPropagation()}
-          >
-            <button
-              className="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-2xl font-bold z-10"
-              onClick={() => setIsQuoteModalOpen(false)}
-              aria-label="닫기"
-              type="button"
-            >
-              ×
-            </button>
-            <iframe
-              className="airtable-embed"
-              src="https://airtable.com/embed/appnhPWwfx1nd35tg/pageG73CLVY72AUXr/form"
-              frameBorder="0"
-              onWheel={undefined}
-              width="100%"
-              height="533"
-              style={{ background: 'transparent', border: '1px solid #ccc' }}
-              title="Airtable 견적 문의 폼"
-              allow="fullscreen"
-            />
-          </div>
-        </div>
-      )}
-      <div className={`container mx-auto px-4 py-8 pb-24 transition-all duration-200 ${isQuoteModalOpen ? 'filter blur-sm pointer-events-none select-none' : ''}`}>
+      <div className="container mx-auto px-4 py-8 pb-24">
         <div className="mb-8 text-center">
           <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             오늘배움 에듀테크 제품
           </h1>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">최신 AI 기술과 혁신적인 교육 방법론을 결합한 오늘배움의 에듀테크 제품으로 교육 현장의 혁신을 경험하세요.</p>
         </div>
-
+        
         {/* AI 제품 섹션 (Perplexity, Claude, ChatGPT) */}
         <div className="mb-12">
           <h2 className="text-2xl font-bold mb-4 text-center">교육용 AI 서비스</h2>
-
+          
           {/* AI 제품 그리드 */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-12">
             {products
@@ -1030,18 +1031,18 @@ export default function ProductsPage() {
                       className="transition-transform duration-500 hover:scale-105"
                     />
                   </div>
-
+                  
                   <div className="p-6 flex-grow">
                     <h2 className="text-xl font-bold mb-2 text-gray-800">{product.name}</h2>
                     <p className="text-gray-600 mb-4">{product.description}</p>
-
+                    
                     {/* 월간/연간 결제 선택 토글 - AI 제품만 표시 */}
                     {['perplexity', 'claude', 'chatgpt'].includes(product.id) && (
                       <div className="mb-4">
                         <div className="flex items-center justify-start gap-3 mb-2">
                           <span className={`text-sm font-medium ${getBillingCycle(product.id) === 'monthly' ? 'text-blue-600' : 'text-gray-500'}`}>월별 결제</span>
-                          <div
-                            className="relative inline-flex h-5 w-10 items-center rounded-full bg-gray-200 transition-colors focus:outline-none data-[state=checked]:bg-blue-600"
+                          <div 
+                            className="relative inline-flex h-5 w-10 items-center rounded-full bg-gray-200 transition-colors focus:outline-none data-[state=checked]:bg-blue-600" 
                             onClick={() => toggleBillingCycle(product.id)}
                           >
                             <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${getBillingCycle(product.id) === 'yearly' ? 'translate-x-5.5' : 'translate-x-1'}`} />
@@ -1050,7 +1051,7 @@ export default function ProductsPage() {
                         </div>
                       </div>
                     )}
-
+                    
                     <div className="mb-4">
                       <h3 className="font-semibold text-gray-700 mb-2">플랜 선택</h3>
                       <div className="flex flex-wrap gap-2 mb-2">
@@ -1079,7 +1080,7 @@ export default function ProductsPage() {
                         ))}
                       </div>
                     </div>
-
+                    
                     <div className="mb-4">
                       <h3 className="font-semibold text-gray-700 mb-2">주요 기능</h3>
                       <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-2 gap-y-1">
@@ -1087,11 +1088,11 @@ export default function ProductsPage() {
                           const selectedPlanId = selectedPlans[product.id] || product.plans[0].id;
                           const selectedPlan = product.plans.find(plan => plan.id === selectedPlanId);
                           let featuresToShow: string[] = [];
-
+                          
                           if (selectedPlan && 'features' in selectedPlan && Array.isArray(selectedPlan.features)) {
                             featuresToShow = selectedPlan.features;
                           }
-
+                          
                           if (featuresToShow.length > 0) {
                             return featuresToShow.map((feature: string, idx: number) => (
                               <li key={idx} className="text-sm text-gray-600 flex items-start">
@@ -1115,10 +1116,10 @@ export default function ProductsPage() {
                       }
                       </ul>
                     </div>
-
+                    
                     <div className="flex items-center gap-2 mb-4">
                       <div className="flex-1 flex items-center border rounded-lg overflow-hidden">
-                        <button
+                        <button 
                           onClick={() => handleQuantityChange(product.id, -1)}
                           className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
                         >
@@ -1138,7 +1139,7 @@ export default function ProductsPage() {
                           className="flex-1 text-center py-2 focus:outline-none"
                           data-component-name="ProductsPage"
                         />
-                        <button
+                        <button 
                           onClick={() => handleQuantityChange(product.id, 1)}
                           className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
                         >
@@ -1150,7 +1151,7 @@ export default function ProductsPage() {
                       const selectedPlanId = selectedPlans[product.id] || product.plans[0].id;
                       const selectedPlan = product.plans.find(plan => plan.id === selectedPlanId);
                       const quantity = quantities[product.id] || 1;
-
+                      
                       if (!selectedPlan) return null;
 
                       // Mizou 학교 요금제의 경우 가격 계산기 표시
@@ -1172,26 +1173,26 @@ export default function ProductsPage() {
                                 localStorage.setItem(`mizou_student_count_${product.id}`, studentCount.toString());
 
                                 // 장바구니에 추가 - 전체 product 객체 전달
-                                handleAddToCart(product, schoolType, studentCount);
+                                handleAddToCart(product);
                               }}
                             />
                           </div>
                         );
                       }
-
+                      
                       // 가격 계산
                       let price = selectedPlan.price;
                       const hasMonthlyOption = ['perplexity', 'claude', 'chatgpt'].includes(product.id);
                       const currentBillingCycle = getBillingCycle(product.id);
-
+                      
                       if (hasMonthlyOption && currentBillingCycle === 'monthly' && 'monthlyPrice' in selectedPlan && typeof selectedPlan.monthlyPrice === 'number') {
                         price = selectedPlan.monthlyPrice;
                       } else if (currentBillingCycle === 'yearly' && 'yearlyPrice' in selectedPlan && typeof selectedPlan.yearlyPrice === 'number') {
                         price = selectedPlan.yearlyPrice;
                       }
-
+                      
                       const totalPrice = price * quantity;
-
+                      
                       return (
                         <div className="mb-3 text-center">
                           <span className="font-semibold text-blue-700">계산된 견적 가격: {totalPrice.toLocaleString()}원</span>
@@ -1202,11 +1203,13 @@ export default function ProductsPage() {
                       onClick={() => handleAddToCart(product)}
                       className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
                     >
-                      <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-                        <path d="M6 6h15l-1.68 8.39A2 2 0 0 1 17.36 16H8.64a2 2 0 0 1-1.96-1.61L4 4H2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <circle cx="9" cy="21" r="1" fill="currentColor"/>
-                        <circle cx="19" cy="21" r="1" fill="currentColor"/>
-                      </svg>
+                                        <span className="cart-icon flex items-center justify-center">
+                    <i className="inline-block w-5 h-5 relative">
+                      <span className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
+                        🛒
+                      </span>
+                    </i>
+                  </span>
                       장바구니에 추가
                     </button>
                   </div>
@@ -1214,7 +1217,7 @@ export default function ProductsPage() {
               ))}
           </div>
         </div>
-
+        
         {/* 기타 제품 섹션 */}
         <h2 className="text-2xl font-bold mb-4 text-center">교육용 툴 및 서비스</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-12">
@@ -1237,11 +1240,11 @@ export default function ProductsPage() {
                   className="transition-transform duration-500 hover:scale-105"
                 />
               </div>
-
+              
               <div className="p-6 flex-grow">
                 <h2 className="text-xl font-bold mb-2 text-gray-800">{product.name}</h2>
                 <p className="text-gray-600 mb-4">{product.description}</p>
-
+                
                 <div className="mb-4">
                   <h3 className="font-semibold text-gray-700 mb-2">플랜 선택</h3>
                   <div className="flex flex-wrap gap-2 mb-2">
@@ -1270,7 +1273,7 @@ export default function ProductsPage() {
                     ))}
                   </div>
                 </div>
-
+                
                 <div className="mb-4">
                   <h3 className="font-semibold text-gray-700 mb-2">주요 기능</h3>
                   <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-2 gap-y-1">
@@ -1278,11 +1281,11 @@ export default function ProductsPage() {
                       const selectedPlanId = selectedPlans[product.id] || product.plans[0].id;
                       const selectedPlan = product.plans.find(plan => plan.id === selectedPlanId);
                       let featuresToShow: string[] = [];
-
+                      
                       if (selectedPlan && 'features' in selectedPlan && Array.isArray(selectedPlan.features)) {
                         featuresToShow = selectedPlan.features;
                       }
-
+                      
                       if (featuresToShow.length > 0) {
                         return featuresToShow.map((feature: string, idx: number) => (
                           <li key={idx} className="text-sm text-gray-600 flex items-start">
@@ -1312,14 +1315,14 @@ export default function ProductsPage() {
                   )}
                 </div>
               </div>
-
+              
               <div className="px-6 pb-6">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-sm font-medium text-gray-700">
                     {product.id === 'mizou' && selectedPlans[product.id] === 'school' ? '학생 수:' : '수량:'}
                   </span>
                   <div className="flex items-center border rounded-lg overflow-hidden">
-                    <button
+                    <button 
                       className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700"
                       onClick={() => {
                         if (product.id === 'mizou' && selectedPlans[product.id] === 'school') {
@@ -1341,7 +1344,7 @@ export default function ProductsPage() {
                         product.id === 'mizou' && selectedPlans[product.id] === 'school'
                           ? studentCounts[product.id] || 300
                           : product.id === 'padlet' && selectedPlans[product.id] === 'school'
-                            ? Math.max(10, quantities[product.id] || 10)
+                        ? Math.max(10, quantities[product.id] || 10) 
                             : quantities[product.id] || 1
                       }
                       onChange={(e) => {
@@ -1362,7 +1365,7 @@ export default function ProductsPage() {
                       className="w-16 text-center focus:outline-none"
                       data-component-name="ProductsPage"
                     />
-                    <button
+                    <button 
                       className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700"
                       onClick={() => {
                         if (product.id === 'mizou' && selectedPlans[product.id] === 'school') {
@@ -1382,12 +1385,12 @@ export default function ProductsPage() {
                 {(() => {
                   const selectedPlanId = selectedPlans[product.id] || product.plans[0].id;
                   const selectedPlan = product.plans.find(plan => plan.id === selectedPlanId);
-                  const quantity = product.id === 'padlet' && selectedPlanId === 'school'
-                    ? Math.max(10, quantities[product.id] || 10)
+                  const quantity = product.id === 'padlet' && selectedPlanId === 'school' 
+                    ? Math.max(10, quantities[product.id] || 10) 
                     : quantities[product.id] || 1;
-
+                  
                   if (!selectedPlan) return null;
-
+                  
                   // 가격 계산
                   let price = selectedPlan.price;
                   let totalPrice = price;
@@ -1397,7 +1400,7 @@ export default function ProductsPage() {
                     price = selectedPlan.yearlyPrice;
                     unitPrice = price;
                   }
-
+                  
                   // Mizou 학교 플랜의 경우 학생 수에 따른 가격 계산
                   if (product.id === 'mizou' && selectedPlanId === 'school') {
                     const studentCount = studentCounts[product.id] || 300;
@@ -1476,7 +1479,7 @@ export default function ProductsPage() {
                   } else {
                     totalPrice = price * quantity;
                   }
-
+                  
                   // Mizou 학교 플랜의 경우 학교 유형과 학생 수 표시
                   if (product.id === 'mizou' && selectedPlanId === 'school') {
                     const studentCount = studentCounts[product.id] || 300;
@@ -1510,7 +1513,7 @@ export default function ProductsPage() {
                     const additionalTeachers = Math.max(0, limitedQuantity - baseQuantity);
                     const totalTeachers = baseQuantity + additionalTeachers;
                     const totalStudents = 200 + (additionalTeachers * 100); // 기본 200명 + 추가 교사당 100명
-
+                    
                     return (
                       <div className="mb-3">
                         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
@@ -1538,37 +1541,26 @@ export default function ProductsPage() {
                   onClick={() => handleAddToCart(product)}
                   className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
                 >
-                  <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-                    <path d="M6 6h15l-1.68 8.39A2 2 0 0 1 17.36 16H8.64a2 2 0 0 1-1.96-1.61L4 4H2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <circle cx="9" cy="21" r="1" fill="currentColor"/>
-                    <circle cx="19" cy="21" r="1" fill="currentColor"/>
-                  </svg>
+                  <span className="cart-icon flex items-center justify-center">
+                    <i className="inline-block w-5 h-5 relative">
+                      <span className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
+                        🛒
+                      </span>
+                    </i>
+                  </span>
                   장바구니에 추가
                 </button>
               </div>
             </div>
           ))}
         </div>
+        
 
-        <div className="mt-16 text-center">
-          <h2 className="text-2xl font-bold mb-4">맞춤형 견적이 필요하신가요?</h2>
-          <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-            다수의 라이센스 구매나 학교/기관 단위 도입을 위한 맞춤형 견적을 받아보세요.
-            오늘배움의 전문 컨설턴트가 최적의 솔루션을 제안해 드립니다.
-          </p>
-          <button
-            className="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition-shadow"
-            data-component-name="ProductsPage"
-            onClick={() => setIsQuoteModalOpen(true)}
-          >
-            맞춤 견적 문의하기
-          </button>
-        </div>
       </div>
-
+      
       {/* 장바구니 버튼 */}
       <CartButton onClick={() => setIsCartOpen(true)} />
-
+      
       {/* 장바구니 드로어 */}
       <CartDrawer open={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </>

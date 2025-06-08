@@ -51,11 +51,13 @@ export default function MiniCartToast({
     >
       <div className="p-3 border-b flex justify-between items-center bg-blue-600 text-white rounded-t-lg">
         <div className="flex items-center gap-2">
-          <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-            <path d="M6 6h15l-1.68 8.39A2 2 0 0 1 17.36 16H8.64a2 2 0 0 1-1.96-1.61L4 4H2" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <circle cx="9" cy="21" r="1" fill="white"/>
-            <circle cx="19" cy="21" r="1" fill="white"/>
-          </svg>
+          <span className="cart-icon flex items-center justify-center">
+            <i className="inline-block w-5 h-5 relative">
+              <span className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
+                🛒
+              </span>
+            </i>
+          </span>
           <h3 className="font-semibold text-white">상품이 추가되었습니다</h3>
         </div>
         <button 
@@ -65,9 +67,7 @@ export default function MiniCartToast({
           }}
           className="text-white hover:text-gray-200"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
+          ✕
         </button>
       </div>
       
