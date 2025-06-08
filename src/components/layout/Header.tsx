@@ -82,6 +82,16 @@ export default function Header() {
           
           {/* 오른쪽 영역: 전화번호와 장바구니 */}
           <div className="hidden md:flex items-center ml-auto">
+            {/* 블로그 링크 */}
+            <Link 
+              href="https://blog.learntoday.co.kr" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-medium text-gray-700 hover:text-blue-600 mr-6"
+            >
+              블로그
+            </Link>
+            
             {/* 전화번호 */}
             <div className="flex flex-col items-end mr-6">
               <span className="text-xs text-gray-500 font-medium">문의전화</span>
@@ -206,6 +216,16 @@ export default function Header() {
               </div>
             )}
           </div>
+          {/* 모바일 블로그 링크 */}
+          <Link 
+            href="https://blog.learntoday.co.kr" 
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block px-4 py-3 text-lg font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-md"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            블로그
+          </Link>
           {/* 모바일 전화번호 - 오른쪽 정렬 */}
           <div className="px-4 py-3 flex flex-col items-end">
             <span className="text-xs text-gray-500">문의전화</span>
