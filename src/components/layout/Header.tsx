@@ -52,6 +52,7 @@ export default function Header() {
               >
                 교육
               </Link>
+              
               <div className="relative">
                 <button 
                   onClick={(e) => {
@@ -79,22 +80,22 @@ export default function Header() {
                   </div>
                 )}
               </div>
-            </div>
-          </nav>
-          
-          {/* 오른쪽 영역: 블로그, 전화번호, 장바구니 */}
-          <div className="hidden md:flex items-center flex-shrink-0">
-            <div className="flex items-center space-x-6">
+              
               {/* 블로그 링크 */}
               <Link 
                 href="https://blog.learntoday.co.kr" 
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm font-medium text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md transition-colors"
+                className="text-gray-700 hover:text-blue-600 font-medium px-4 py-2 rounded-md transition-colors"
               >
                 블로그
               </Link>
-              
+            </div>
+          </nav>
+          
+          {/* 오른쪽 영역: 전화번호와 장바구니 */}
+          <div className="hidden md:flex items-center flex-shrink-0">
+            <div className="flex items-center space-x-6">
               {/* 전화번호 */}
               <div className="flex flex-col items-end">
                 <span className="text-xs text-gray-500 font-medium">문의전화</span>
@@ -108,13 +109,9 @@ export default function Header() {
                   className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-full font-medium hover:bg-blue-700 transition-colors relative"
                   aria-label="장바구니 열기"
                 >
-                  <span className="cart-icon flex items-center justify-center">
-                    <i className="inline-block w-5 h-5 relative">
-                      <span className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
-                        🛒
-                      </span>
-                    </i>
-                  </span>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6H19" />
+                  </svg>
                   <span>장바구니</span>
                   {cartCount > 0 && (
                     <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
@@ -135,13 +132,9 @@ export default function Header() {
                 className="p-2 rounded-md text-gray-500 hover:text-gray-600 hover:bg-gray-100 relative"
                 aria-label="장바구니 열기"
               >
-                <span className="cart-icon flex items-center justify-center">
-                  <i className="inline-block w-6 h-6 relative">
-                    <span className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-lg">
-                      🛒
-                    </span>
-                  </i>
-                </span>
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6H19" />
+                </svg>
                 {cartCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                     {cartCount}

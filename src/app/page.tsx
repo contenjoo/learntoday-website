@@ -8,6 +8,7 @@ export default function Home() {
   const { openDemoScheduler } = useDemoContext();
   const [isMobile, setIsMobile] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [showPlusNewsPopup, setShowPlusNewsPopup] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -22,9 +23,46 @@ export default function Home() {
     // Add event listener
     window.addEventListener('resize', handleResize);
     
+    // 페이지 로드 후 3초 뒤에 팝업 표시
+    const timer = setTimeout(() => {
+      setShowPlusNewsPopup(true);
+      // GTM 이벤트 전송
+      if (typeof window !== 'undefined' && (window as any).gtag) {
+        (window as any).gtag('event', 'popup_show', {
+          event_category: 'engagement',
+          event_label: 'education_plus_news'
+        });
+      }
+    }, 3000);
+    
     // Cleanup
-    return () => window.removeEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(timer);
+    };
   }, []);
+
+  const handlePlusNewsClose = () => {
+    setShowPlusNewsPopup(false);
+    // GTM 이벤트 전송
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', 'popup_close', {
+        event_category: 'engagement',
+        event_label: 'education_plus_news'
+      });
+    }
+  };
+
+  const handlePlusNewsClick = () => {
+    // GTM 이벤트 전송
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', 'popup_click', {
+        event_category: 'engagement',
+        event_label: 'education_plus_news'
+      });
+    }
+    setShowPlusNewsPopup(false);
+  };
 
   // 서버 사이드 렌더링 시 기본값 사용
   if (!mounted) {
@@ -66,11 +104,61 @@ export default function Home() {
                 <p>로딩 중...</p>
               </div>
             </div>
-          </main>
-        </div>
+                  </main>
+        
+        {/* 오늘배움 플러스 소식 팝업 */}
+        {showPlusNewsPopup && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 overflow-hidden">
+              {/* 팝업 헤더 */}
+              <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4 relative">
+                <button
+                  onClick={handlePlusNewsClose}
+                  className="absolute top-2 right-3 text-white hover:text-gray-200 text-2xl font-bold"
+                  aria-label="팝업 닫기"
+                >
+                  ×
+                </button>
+                <div className="text-center">
+                  <div className="text-3xl mb-2">🎉</div>
+                  <h3 className="text-white font-bold text-lg">새로운 소식!</h3>
+                </div>
+              </div>
+              
+              {/* 팝업 내용 */}
+              <div className="px-6 py-5">
+                <h4 className="text-xl font-bold text-gray-900 mb-3 text-center">
+                  오늘배움 플러스 출시!
+                </h4>
+                <p className="text-gray-600 text-center mb-4 leading-relaxed">
+                  2개월 무료 체험 기간과 함께<br/>
+                  더욱 강력해진 교육 솔루션을<br/>
+                  만나보세요!
+                </p>
+                
+                <div className="flex gap-3">
+                  <button
+                    onClick={handlePlusNewsClose}
+                    className="flex-1 px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium transition-colors"
+                  >
+                    나중에
+                  </button>
+                  <Link
+                    href="/education/plus"
+                    onClick={handlePlusNewsClick}
+                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors text-center"
+                  >
+                    자세히 보기
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   return (
     <div className="font-[family-name:var(--font-geist-sans)]">
