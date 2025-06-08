@@ -35,7 +35,7 @@ export default function Header() {
                 height={40}
                 priority
                 quality={100}
-                className="h-12 w-auto md:h-14 lg:h-16"
+                className="h-10 w-auto sm:h-12 md:h-14 lg:h-16"
                 style={{ objectFit: 'contain' }}
               />
             </Link>
@@ -118,12 +118,12 @@ export default function Header() {
             {isEducationPage && (
               <button
                 onClick={() => setIsCartOpen(!isCartOpen)}
-                className="p-2 rounded-md text-gray-500 hover:text-gray-600 hover:bg-gray-100 relative"
+                className="p-3 rounded-md text-gray-500 hover:text-gray-600 hover:bg-gray-100 relative"
                 aria-label="장바구니 열기"
               >
                 <span className="cart-icon flex items-center justify-center">
-                  <i className="inline-block w-6 h-6 relative">
-                    <span className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-lg">
+                  <i className="inline-block w-7 h-7 relative">
+                    <span className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-xl">
                       🛒
                     </span>
                   </i>
@@ -139,15 +139,15 @@ export default function Header() {
             {/* 모바일 메뉴 버튼 */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 rounded-md text-gray-500 hover:text-gray-600 hover:bg-gray-100"
+              className="p-3 rounded-md text-gray-500 hover:text-gray-600 hover:bg-gray-100"
             >
               <span className="sr-only">메뉴 열기</span>
               {isMenuOpen ? (
-                <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-7 w-7" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               ) : (
-                <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-7 w-7" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               )}
@@ -166,31 +166,48 @@ export default function Header() {
       )}
       
       {/* 모바일 메뉴 */}
-      <div className={`${isMenuOpen ? 'block' : 'hidden'} md:hidden fixed top-[65px] left-0 w-full z-50`}>
-        <div className="px-2 pt-2 pb-3 space-y-2 border-t border-gray-200 bg-white shadow-lg">
+      <div className={`${isMenuOpen ? 'block' : 'hidden'} md:hidden fixed top-[73px] left-0 w-full z-50`}>
+        <div className="px-2 pt-2 pb-3 space-y-1 border-t border-gray-200 bg-white shadow-lg">
           <Link 
             href="/education" 
-            className={`block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-md ${
+            className={`block px-4 py-3 text-lg font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-md ${
               pathname === '/education' ? 'bg-blue-50 text-blue-600' : ''
             }`}
+            onClick={() => setIsMenuOpen(false)}
           >
             교육
           </Link>
-          <button 
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setShowComingSoonPopup(!showComingSoonPopup);
-              setIsMenuOpen(false);
-            }}
-            className={`block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-md w-full text-left ${
-              pathname === '/enterprise' ? 'bg-blue-50 text-blue-600' : ''
-            }`}
-          >
-            비즈니스
-          </button>
+          <div className="relative">
+            <button 
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setShowComingSoonPopup(!showComingSoonPopup);
+              }}
+              className={`block px-4 py-3 text-lg font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-md w-full text-left ${
+                pathname === '/enterprise' ? 'bg-blue-50 text-blue-600' : ''
+              }`}
+            >
+              비즈니스
+            </button>
+            
+            {/* 모바일 비즈니스 팝업 */}
+            {showComingSoonPopup && (
+              <div className="mt-2 mx-4 bg-blue-50 rounded-lg border border-blue-200 p-4">
+                <div className="flex items-center space-x-3">
+                  <div className="text-xl">🚀</div>
+                  <div>
+                    <h3 className="text-sm font-bold text-gray-900">곧 찾아옵니다!</h3>
+                    <p className="text-xs text-gray-600">
+                      비즈니스 솔루션을 준비 중입니다.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
           {/* 모바일 전화번호 - 오른쪽 정렬 */}
-          <div className="px-3 py-2 flex flex-col items-end">
+          <div className="px-4 py-3 flex flex-col items-end">
             <span className="text-xs text-gray-500">문의전화</span>
             <a href="tel:0507-1316-1571" className="text-xl font-bold text-blue-700">0507-1316-1571</a>
           </div>
