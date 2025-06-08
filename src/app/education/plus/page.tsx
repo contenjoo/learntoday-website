@@ -111,6 +111,30 @@ export default function EducationPlusPage() {
             </h2>
           </div>
           
+          {/* 기간 한정 신청 안내 */}
+          <div className="bg-gradient-to-r from-orange-50 to-red-50 border-l-4 border-orange-400 rounded-lg p-6 mb-8">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <span className="text-2xl">⏰</span>
+              </div>
+              <div className="ml-4">
+                <h3 className="text-lg font-bold text-orange-800 mb-2">
+                  ⚠️ 기간 한정 신청 서비스
+                </h3>
+                <p className="text-orange-700 leading-relaxed">
+                  <strong>오늘배움 플러스는 상시 신청이 아닙니다.</strong> 파트너 에듀테크 기업들과의 협의를 통해 
+                  <strong className="text-red-600">특정 기간에만 신청을 받고 있습니다.</strong> 
+                  신청 기간과 조건은 추후 별도로 안내드릴 예정이니, 관심 있으신 학교는 미리 
+                  <strong>오늘배움 회원가입</strong>을 해두시기 바랍니다.
+                </p>
+                <div className="mt-4 flex items-center text-sm text-orange-600">
+                  <span className="mr-2">📧</span>
+                  신청 기간 오픈 시 회원님께 우선 안내해드립니다
+                </div>
+              </div>
+            </div>
+          </div>
+          
           <div className="grid md:grid-cols-2 gap-8 mb-12">
             {/* 신청 자격 */}
             <div className="bg-white rounded-lg p-8 shadow-sm">
@@ -364,8 +388,9 @@ export default function EducationPlusPage() {
                 <h3 className="text-xl font-medium text-gray-900 mb-2">교사 동의 및 신청</h3>
                 <ul className="text-gray-700 space-y-1">
                   <li>• 교사 동의서 수집 (15명 이상 또는 전체)</li>
-                  <li>• 공식 체험 신청서 제출 (신청 기간 내)</li>
+                  <li>• <strong className="text-red-600">지정된 신청 기간 내</strong> 공식 체험 신청서 제출</li>
                   <li>• 체험 일정 및 교육 스케줄 확정</li>
+                  <li>• <span className="text-orange-600 text-sm">※ 신청 기간은 별도 안내</span></li>
                 </ul>
               </div>
             </div>

@@ -135,6 +135,11 @@ export default function Home() {
                   더욱 강력해진 교육 솔루션을<br/>
                   만나보세요!
                 </p>
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-4">
+                  <p className="text-orange-700 text-sm text-center">
+                    ⏰ <strong>기간 한정</strong> 신청 서비스입니다
+                  </p>
+                </div>
                 
                 <div className="flex gap-3">
                   <button
